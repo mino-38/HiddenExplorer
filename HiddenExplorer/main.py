@@ -16,19 +16,21 @@ crypto_file = os.path.join(root, ".data")
 
 class MainFrame(wx.Frame):
     size = (800, 500)
-    def __init__(self, key):
+    def __init__(self, bytes_):
         super().__init__(None, title=TITLE, size=MainFrame.size)
-        self.key = key
+        self.bytes = bytes_
         self.build()
 
     def build(self):
-        with tempfile.TemporaryDirectory() as d:
-            pass
-            updater = wx.UpdateDialog(None)
-            updater.Show()
-            for i in glob.iglob(os.path.join(d, "**"), recursive=True):
-                pass
-            updater.Destroy()
+        with NamedTemporaryFile("wb") as t, tempfile.TemporaryDirectory() as d:
+            t.write(self.bytes)
+            with tarfile.open(t.name, "r") as g:
+                g.extractall(d)
+                updater = wx.UpdateDialog(None)
+                updater.Show()
+                for i in glob.iglob(os.path.join(d, "**"), recursive=True):
+                    pass
+                updater.Destroy()
 
 class InitFrame(wx.Frame):
     size = (500, 300)
