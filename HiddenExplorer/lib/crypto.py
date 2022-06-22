@@ -1,11 +1,9 @@
-import tempfile
-
 from Crypto.Cipher import AES
 
 
 def crypto(data, key):
     cipher = AES.new(key, AES.MODE_EAX)
-    return cipher.crypto(data)
+    return cipher.encrypto(data)
 
 def decrypto(data, key):
     cipher = AES.new(key, AES.MODE_EAX)
