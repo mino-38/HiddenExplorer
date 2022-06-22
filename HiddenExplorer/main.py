@@ -26,7 +26,7 @@ class MainFrame(wx.Frame):
             t.write(self.bytes)
             with tarfile.open(t.name, "r") as g:
                 g.extractall(d)
-                updater = wx.UpdateDialog(None)
+                updater = wx.ProgressDialog(None, TITLE, "ロード中...", style=wx.PD_REMAINING_TIME | wx.PD_ELAPSED_TIME)
                 updater.Show()
                 for i in glob.iglob(os.path.join(d, "**"), recursive=True):
                     pass
