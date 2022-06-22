@@ -22,6 +22,9 @@ class MainFrame(wx.Frame):
         self.build()
 
     def build(self):
+        self.sizer = wx.BoxSizer()
+        self.psizer = wx.GridSizer(cols=4)
+        self.panel = wx.Panel(self)
         with NamedTemporaryFile("wb") as t, tempfile.TemporaryDirectory() as d:
             t.write(self.bytes)
             with tarfile.open(t.name, "r") as g:
@@ -29,8 +32,18 @@ class MainFrame(wx.Frame):
                 updater = wx.ProgressDialog(None, TITLE, "ロード中...", style=wx.PD_REMAINING_TIME | wx.PD_ELAPSED_TIME)
                 updater.Show()
                 for i in glob.iglob(os.path.join(d, "**"), recursive=True):
-                    pass
+                    self.set_layout(i)
                 updater.Destroy()
+        self.panel.SetSizer(self.psizer)
+        self.sizer.Add(self.panel)
+        self.SetSizer(self.sizer)
+
+    def set_layout(self, path):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        panel = wx.Panel(self.panel)
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
+        panel.SetSizer(sizer)
+        self.psizer.Add(panel)
 
 class InitFrame(wx.Frame):
     size = (500, 300)
