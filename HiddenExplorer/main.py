@@ -1,4 +1,3 @@
-import glob
 import os
 import tempfile
 import zipfile
@@ -18,10 +17,14 @@ if not os.path.isdir(root):
 crypto_file = os.path.join(root, ".data")
 key_file = os.path.join(root, ".key")
 
-def encrypt(key):
+def get_key():
+    with open(key_file, "rb") as f:
+        return f.read()
+
+def encrypt(file, key):
     cipher = AES.new(key, AES.MODE_EAX)
-    with open(crypto_file, "wb+") as f:
-        f.write(cipher.encrypt(f.read()))
+    with open(file, "rb") as f, open(crypto_file, "wb") as g:
+        g.write(cipher.encrypt(f.read()))
 
 def decrypt(key):
     with open(crypto_file, "rb") as f:
@@ -57,6 +60,16 @@ class MainFrame(wx.Frame):
             self.sizer.Add(wx.StaticText(self, wx.ID_ANY, "まだ何もありません"))
             self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
+
+    def add(self, path):
+        with NamedTemporaryFile("wb") as f:
+            f.write(self.bytes)
+            with zipfile.ZipFile(f.name, "r") as z:
+                z.add(path)
+            shutil.rmtree(path)
+            encrypt(f.name, get_key())
+        self.set_layout(path)
+        self.Refresh()
 
     def set_layout(self, path):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -122,10 +135,11 @@ class InitFrame(wx.Frame):
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
-                shutil.make_archive(crypto_file, "zip", d)
-                shutil.move(crypto_file+".zip", crypto_file)
-            key = get_random_bytes(AES.block_size*2)
-            encrypt(key)
+                with NamedTemporaryFile("wb+") as z:
+                    shutil.make_archive(z.name, "zip", d)
+                    shutil.move(z.name+".zip", crypto_file)
+                    key = get_random_bytes(AES.block_size*2)
+                    encrypt(z.name, key)
             with open(key_file, "wb") as f:
                 f.write(key)
             self.Destroy()
