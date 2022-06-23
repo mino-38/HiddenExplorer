@@ -1,4 +1,5 @@
 import os
+import pickle
 import tempfile
 import zipfile
 
@@ -16,32 +17,36 @@ if not os.path.isdir(root):
     os.mkdir(root)
 crypto_file = os.path.join(root, ".data")
 key_file = os.path.join(root, ".key")
+if not os.path.isfile(key_file):
+    key = get_random_bytes(AES.block_size*2)
+    with open(key_file, "wb") as f:
+        pickle.dump(key, f)
 
 def get_key():
     with open(key_file, "rb") as f:
-        return f.read()
+        return pickle.load(f)
 
-def encrypt(file, key):
-    cipher = AES.new(key, AES.MODE_EAX)
+def encrypt(file, password):
+    cipher1 = AES.new(get_key(), AES.MODE_EAX)
+    cipher2 = AES.new(password, AES.MODE_EAX)
     with open(file, "rb") as f, open(crypto_file, "wb") as g:
-        g.write(cipher.encrypt(f.read()))
+        g.write(cipher1.encrypt(cipher2.encrypt(f.read())))
 
-def decrypt(key):
+def decrypt(password):
+    cipher1 = AES.new(get_key(), AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
-        data = f.read()
-    with open(key_file, "rb") as k:
-        cipher1 = AES.new(k.read(), AES.MODE_EAX)
-        data = cipher1.decrypt(data)
-    cipher2 = AES.new(key, AES.MODE_EAX)
+        data = cipher1.decrypt(f.read())
+    cipher2 = AES.new(password, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
 
 class MainFrame(wx.Frame):
     size = (800, 500)
-    def __init__(self, bytes_=None, files=None):
+    def __init__(self, bytes_=None, files=None, password=None):
         super().__init__(None, title=TITLE, size=MainFrame.size)
         self.bytes = bytes_
         self.files = files
+        self.password = password
         self.build()
 
     def build(self):
@@ -67,7 +72,7 @@ class MainFrame(wx.Frame):
             with zipfile.ZipFile(f.name, "a") as z:
                 z.write(path)
             shutil.rmtree(path)
-            encrypt(f.name, get_key())
+            encrypt(f.name, self.password)
         self.set_layout(path)
         self.Refresh()
 
@@ -104,7 +109,10 @@ class AskPasswordFrame(wx.Frame):
             f.write(bytes_)
             f.flush()
             if zipfile.is_zipfile(f.name):
-                MainFrame(bytes_, zipfile.ZipFile(f.name).namelist())
+                MainFrame(bytes_, zipfile.ZipFile(f.name).namelist(), password)
+            else:
+                self.error.SetLabel("パスワードが違います")
+                self.Refresh()
 
 class InitFrame(wx.Frame):
     size = (500, 300)
@@ -138,10 +146,7 @@ class InitFrame(wx.Frame):
                 with NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
-                    key = get_random_bytes(AES.block_size*2)
-                    encrypt(z.name, key)
-            with open(key_file, "wb") as f:
-                f.write(key)
+                    encrypt(z.name, password)
             self.Destroy()
         else:
             self.error.SetLabel("パスワードが一致していません")
