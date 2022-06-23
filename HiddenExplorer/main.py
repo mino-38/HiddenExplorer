@@ -64,8 +64,8 @@ class MainFrame(wx.Frame):
     def add(self, path):
         with NamedTemporaryFile("wb") as f:
             f.write(self.bytes)
-            with zipfile.ZipFile(f.name, "r") as z:
-                z.add(path)
+            with zipfile.ZipFile(f.name, "a") as z:
+                z.write(path)
             shutil.rmtree(path)
             encrypt(f.name, get_key())
         self.set_layout(path)
