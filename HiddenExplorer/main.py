@@ -203,7 +203,7 @@ class AskPasswordFrame(wx.Frame):
         self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
 
-    def login(self):
+    def login(self, e):
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
         with tempfile.NamedTemporaryFile("wb") as f:
