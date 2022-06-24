@@ -79,9 +79,10 @@ class MainFrame(wx.Frame):
         self.files = files
         self.password = password
         self.SetDropTarget(FileDropTarget(self.add))
-        self.func = {1: self.add_from_dialog}
+        self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
+        menu_file.Append(2, "ディレクトリを追加")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
         self.SetMenuBar(menu_bar)
@@ -92,8 +93,11 @@ class MainFrame(wx.Frame):
     def run_menu(self, e):
         self.func[e.GetId()]()
 
-    def add_from_dialog(self):
-        fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
+    def add_from_dialog(self, directory=False):
+        if directory:
+            fdialog = wx.DirDialog(None, TITLE, style=wx.DD_MULTIPLE)
+        else:
+            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
         if fdialog.ShowModal() == wx.ID_OK:
             paths = fdialog.GetPaths()
             if paths:
