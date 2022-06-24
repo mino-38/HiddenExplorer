@@ -40,12 +40,10 @@ def encrypt(file, password):
 
 def decrypt(password):
     cipher1 = AES.new(KEY, AES.MODE_EAX, IV)
-    with open(crypto_file, "rb") as f:
-        data = cipher1.decrypt(f.read())
     password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
     cipher2 = AES.new(password, AES.MODE_EAX, IV)
     with open(crypto_file, "rb") as f:
-        return cipher2.decrypt(data)
+        return cipher2.decrypt(cipher1.decrypt(f.read()))
 
 def get_icon(path):
     icoX = win32api.GetSystemMetrics(win32con.SM_CXICON)
@@ -148,11 +146,12 @@ class MainFrame(wx.Frame):
             files = [path] if isinstance(path, str) else path
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
-            self.password = init.password
-            self.bytes = decrypt(self.password)
-            self.files = files
-            for p in files:
-                self.set_layout(p)
+            if hasattr(init, "password"):
+                self.password = init.password
+                self.bytes = decrypt(self.password)
+                self.files = files
+                for p in files:
+                    self.set_layout(p)
         self.Refresh()
 
     def set_layout(self, path):
