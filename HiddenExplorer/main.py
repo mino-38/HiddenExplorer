@@ -188,15 +188,18 @@ class AskPasswordFrame(wx.Frame):
 
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = wx.Panel(self)
-        self.sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerを利用するパスワードを入力してください"))
-        self.ctrl = wx.TextCtrl(self.panel, size=(200, 50))
-        self.sizer.Add(self.ctrl)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerを利用するパスワードを入力してください"))
+        self.ctrl = wx.TextCtrl(self.panel, size=(200, 20))
+        sizer.Add(self.ctrl)
         self.error = wx.StaticText(self.panel)
         self.error.SetForegroundColour("#FF0000")
-        self.sizer.Add(self.error)
+        sizer.Add(self.error)
         self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
         self.button.Bind(wx.EVT_BUTTON, self.login)
+        sizer.Add(self.button)
+        self.panel.SetSizer(sizer)
         self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
 
