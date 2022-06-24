@@ -30,16 +30,16 @@ else:
 
 def encrypt(file, password):
     cipher1 = AES.new(KEY, AES.MODE_EAX)
-    password += FILL*(len(password) % AES.block_size)
+    password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
     cipher2 = AES.new(password, AES.MODE_EAX)
-    with open(file, "rb") as f, open(crypto_file, "wb") as g:
-        g.write(cipher1.encrypt(cipher2.encrypt(f.read())))
+    with open(crypto_file, "wb") as g:
+        g.write(cipher1.encrypt(cipher2.encrypt(file.read())))
 
 def decrypt(password):
     cipher1 = AES.new(KEY, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         data = cipher1.decrypt(f.read())
-    password = password.encode() + FILL*(len(password) % AES.block_size)
+    password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
     cipher2 = AES.new(password, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
@@ -127,7 +127,7 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
-            with tempfile.NamedTemporaryFile("wb") as f:
+            with tempfile.NamedTemporaryFile("wb+") as f:
                 f.write(self.bytes)
                 with zipfile.ZipFile(f.name, "a") as z:
                     if isinstance(path, str):
@@ -139,7 +139,7 @@ class MainFrame(wx.Frame):
                     shutil.rmtree(path)
                 else:
                     os.remove(path)
-                encrypt(f.name, self.password)
+                encrypt(f, self.password)
                 self.set_layout(path)
         else:
             files = [path] if isinstance(path, str) else path
@@ -254,7 +254,7 @@ class InitDialog(wx.Dialog):
                 with tempfile.NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
-                    encrypt(z.name, self.password)
+                    encrypt(z, self.password)
             self.Close()
         else:
             self.error.SetLabel("パスワードが一致していません")
