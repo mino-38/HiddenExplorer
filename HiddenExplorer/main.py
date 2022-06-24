@@ -76,7 +76,10 @@ class MainFrame(wx.Frame):
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "a") as z:
                 z.write(path)
-            shutil.rmtree(path)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
             encrypt(f.name, self.password)
         self.set_layout(path)
         self.Refresh()
