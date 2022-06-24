@@ -72,16 +72,28 @@ class MainFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def add(self, path):
-        with tempfile.NamedTemporaryFile("wb") as f:
-            f.write(self.bytes)
-            with zipfile.ZipFile(f.name, "a") as z:
-                z.write(path)
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-            else:
-                os.remove(path)
-            encrypt(f.name, self.password)
-        self.set_layout(path)
+        if self.bytes_:
+            with tempfile.NamedTemporaryFile("wb") as f:
+                f.write(self.bytes)
+                with zipfile.ZipFile(f.name, "a") as z:
+                    if isinstance(path, str):
+                        z.write(path)
+                    else:
+                        for p in path:
+                            z.write(p)
+                if os.path.isdir(path):
+                    shutil.rmtree(path)
+                else:
+                    os.remove(path)
+                encrypt(f.name, self.password)
+                self.set_layout(path)
+        else:
+            files = [path] if isinstance(path, str) else path
+            init = InitDialog(self.set_layout, files)
+            init.ShowModal()
+            self.password = init.password
+            self.bytes = decrypt(self.password)
+            self.files = files
         self.Refresh()
 
     def set_layout(self, path):
@@ -122,10 +134,11 @@ class AskPasswordFrame(wx.Frame):
                 self.error.SetLabel("パスワードが違います")
                 self.Refresh()
 
-class InitFrame(wx.Frame):
+class InitDialog(wx.Dialog):
     size = (500, 300)
-    def __init__(self, files):
+    def __init__(self, func, files):
         super().__init__(None, title=TITLE+"  初期化", size=InitFrame.size)
+        self.run_func = func
         self.files = files
         self.build()
 
@@ -146,15 +159,16 @@ class InitFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def set_password(self, e):
-        password = self.ctrl1.GetValue()
-        if password == self.ctrl2.GetValue():
+        self.password = self.ctrl1.GetValue()
+        if self.password == self.ctrl2.GetValue():
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
+                    self.run_func(p)
                 with tempfile.NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
-                    encrypt(z.name, password)
+                    encrypt(z.name, self.password)
             self.Destroy()
         else:
             self.error.SetLabel("パスワードが一致していません")
@@ -165,7 +179,7 @@ def main():
     if os.path.isfile(crypto_file):
         AskPasswordFrame().Show()
     else:
-        InitFrame().Show()
+        MainFrame().Show()
     app.MainLoop()
 
 if __name__ == "__main__":
