@@ -72,7 +72,7 @@ class MainFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def add(self, path):
-        with NamedTemporaryFile("wb") as f:
+        with tempfile.NamedTemporaryFile("wb") as f:
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "a") as z:
                 z.write(path)
@@ -151,7 +151,7 @@ class InitFrame(wx.Frame):
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
-                with NamedTemporaryFile("wb+") as z:
+                with tempfile.NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
                     encrypt(z.name, password)
