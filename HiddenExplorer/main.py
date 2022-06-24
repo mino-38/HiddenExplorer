@@ -83,6 +83,7 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_file, "ファイル")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
+        self.default_fileicon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "default_icon.png")).Scale(120, 90).ConvertToBitmap()
         self.build()
 
     def run_menu(self, e):
@@ -145,10 +146,13 @@ class MainFrame(wx.Frame):
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "r") as z:
                 z.extract(path, g.name)
-            img = get_icon(g.name).Scale(120, 90)
-            image = wx.EmptyImage(img.size[0], img.size[1])
-            image.SetData(img.convert("RGB").tostring())
-            sizer.Add(image)
+            try:
+                img = get_icon(g.name).Scale(120, 90)
+                image = wx.EmptyImage(img.size[0], img.size[1])
+                image.SetData(img.convert("RGB").tostring())
+                sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap()))
+            except:
+                sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon))
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
