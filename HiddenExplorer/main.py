@@ -13,6 +13,7 @@ from PIL import Image
 from wx.lib.scrolledpanel import ScrolledPanel
 
 TITLE = "HiddenExplorer"
+FILL = b"a"
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
 if not os.path.isdir(root):
@@ -29,6 +30,7 @@ else:
 
 def encrypt(file, password):
     cipher1 = AES.new(KEY, AES.MODE_EAX)
+    password += FILL*(len(password) % AES.block_size)
     cipher2 = AES.new(password, AES.MODE_EAX)
     with open(file, "rb") as f, open(crypto_file, "wb") as g:
         g.write(cipher1.encrypt(cipher2.encrypt(f.read())))
