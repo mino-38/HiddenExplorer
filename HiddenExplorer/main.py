@@ -257,9 +257,13 @@ class InitDialog(wx.Dialog):
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
-                with tempfile.NamedTemporaryFile("wb+") as z:
-                    shutil.make_archive(z.name, "zip", d)
-                    encrypt(z, self.password)
+                temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+                try:
+                    shutil.make_archive(temp_zip, "zip", d)
+                    with open(temp_zip+".zip", "rb") as z:
+                        encrypt(z, self.password)
+                finally:
+                    os.remove(temp_zip+".zip")
             self.Close()
         else:
             self.error.SetLabel("パスワードが一致していません")
