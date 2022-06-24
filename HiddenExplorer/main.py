@@ -98,9 +98,9 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self, directory=False):
         if directory:
-            fdialog = wx.DirDialog(None, TITLE, style=wx.DD_MULTIPLE)
+            fdialog = wx.DirDialog(None, TITLE, style=wx.FD_OPEN | wx.DD_MULTIPLE)
         else:
-            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
+            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_OPEN | wx.FD_MULTIPLE)
         if fdialog.ShowModal() == wx.ID_OK:
             paths = fdialog.GetPaths()
             if paths:
@@ -193,6 +193,7 @@ class AskPasswordFrame(wx.Frame):
         self.ctrl = wx.TextCtrl(self.panel, size=(200, 50))
         self.sizer.Add(self.ctrl)
         self.error = wx.StaticText(self.panel)
+        self.error.SetForegroundColour("#FF0000")
         self.sizer.Add(self.error)
         self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
         self.button.Bind(wx.EVT_BUTTON, self.login)
@@ -230,6 +231,7 @@ class InitDialog(wx.Dialog):
         self.ctrl2 = wx.TextCtrl(self.panel, size=(300, 20))
         sizer.Add(self.ctrl2)
         self.error = wx.StaticText(self.panel)
+        self.error.SetForegroundColour("#FF0000")
         sizer.Add(self.error)
         self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
         self.button.Bind(wx.EVT_BUTTON, self.set_password)
