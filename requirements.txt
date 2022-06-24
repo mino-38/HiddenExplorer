@@ -1,0 +1,4 @@
+wxpython
+pycryptodome
+Pillow
+pywin32

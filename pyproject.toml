@@ -8,6 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.8"
 pycryptodome = "^3.14.1"
+Pillow = "^9.1.1"
 
 [tool.poetry.dev-dependencies]
 
