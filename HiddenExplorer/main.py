@@ -52,7 +52,24 @@ class MainFrame(wx.Frame):
         self.files = files
         self.password = password
         self.SetDropTarget(FileDropTarget(self.add))
+        self.func = {1: self.add_from_dialog}
+        menu_file = wx.Menu()
+        menu_file.Append(1, "ファイルを追加")
+        menu_bar = wx.MenuBar()
+        menu_bar.Append(menu_file, "ファイル")
+        self.SetMenuBar(menu_bar)
+        self.Bind(wx.EVT_MENU, self.run_menu)
         self.build()
+
+    def run_menu(self, e):
+        self.func[e.GetId()]()
+
+    def add_from_dialog(self):
+        fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
+        if dlg.ShowModal() == wx.ID_OK:
+            paths = fdialog.GetPaths()
+            if paths:
+                self.add(paths)
 
     def build(self):
         if hasattr(self, "sizer"):
