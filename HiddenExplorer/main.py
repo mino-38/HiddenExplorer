@@ -1,5 +1,4 @@
 import os
-import pickle
 import tempfile
 import zipfile
 
@@ -15,23 +14,22 @@ if not os.path.isdir(root):
     os.mkdir(root)
 crypto_file = os.path.join(root, ".data")
 key_file = os.path.join(root, ".key")
-if not os.path.isfile(key_file):
-    key = get_random_bytes(AES.block_size*2)
-    with open(key_file, "wb") as f:
-        pickle.dump(key, f)
-
-def get_key():
+if os.path.isfile(key_file):
     with open(key_file, "rb") as f:
-        return pickle.load(f)
+        KEY = f.read()
+else:
+    KEY = get_random_bytes(AES.block_size*2)
+    with open(key_file, "wb") as f:
+        f.write(KEY)
 
 def encrypt(file, password):
-    cipher1 = AES.new(get_key(), AES.MODE_EAX)
+    cipher1 = AES.new(KEY, AES.MODE_EAX)
     cipher2 = AES.new(password, AES.MODE_EAX)
     with open(file, "rb") as f, open(crypto_file, "wb") as g:
         g.write(cipher1.encrypt(cipher2.encrypt(f.read())))
 
 def decrypt(password):
-    cipher1 = AES.new(get_key(), AES.MODE_EAX)
+    cipher1 = AES.new(KEY, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         data = cipher1.decrypt(f.read())
     cipher2 = AES.new(password, AES.MODE_EAX)
