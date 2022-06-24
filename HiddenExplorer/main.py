@@ -3,10 +3,9 @@ import tempfile
 import zipfile
 
 import wx
-
-from PIL import Image
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+from PIL import Image
 from wx.lib.scrolledpanel import ScrolledPanel
 
 TITLE = "HiddenExplorer"
