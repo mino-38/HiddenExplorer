@@ -8,8 +8,6 @@ import wx
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 
-from HiddenExplorer.lib.crypto import encrypto, decrypto
-
 TITLE = "HiddenExplorer"
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
