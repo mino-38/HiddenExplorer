@@ -151,7 +151,7 @@ class MainFrame(wx.Frame):
     def set_layout(self, path):
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(150, 120))
-        with NamedTemporaryFile("wb") as f, NamedTemporaryFile("wb") as g:
+        with tempfile.NamedTemporaryFile("wb") as f, tempfile.NamedTemporaryFile("wb") as g:
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "r") as z:
                 z.extract(path, g.name)
