@@ -118,7 +118,7 @@ class MainFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def add(self, path):
-        if self.bytes_:
+        if self.bytes:
             with tempfile.NamedTemporaryFile("wb") as f:
                 f.write(self.bytes)
                 with zipfile.ZipFile(f.name, "a") as z:
