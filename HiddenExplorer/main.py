@@ -259,7 +259,6 @@ class InitDialog(wx.Dialog):
                     shutil.move(p, d)
                 with tempfile.NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
-                    shutil.move(z.name+".zip", crypto_file)
                     encrypt(z, self.password)
             self.Close()
         else:
