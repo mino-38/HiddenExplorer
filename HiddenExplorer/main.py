@@ -1,5 +1,4 @@
 import os
-import subprocess
 import tempfile
 import zipfile
 
@@ -51,6 +50,15 @@ def get_icon(path):
     hdc.DrawIcon((0,0), large[0])
     bmpstr = hbmp.GetBitmapBits(True)
     return Image.frombuffer("RGBA", (32, 32), bmpstr, "raw", "BGRA", 0, 1)
+
+class RunFunction:
+    def __init__(self, func, *args, **kwargs):
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, *_, **__):
+        self.func(*self.args, **self.kwargs)
 
 class FileDropTarget(wx.FileDropTarget):
     def __init__(self, func):
@@ -143,15 +151,18 @@ class MainFrame(wx.Frame):
             sizer.Add(image)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
         panel.SetSizer(sizer)
-        panel.Bind(wx.EVT_LEFT_DCLICK, lambda: self.run_file(path))
+        panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         self.psizer.Add(panel)
 
     def run_file(self, path):
+        threading.Thread(target=self._run_file, args=(path,)).start()
+
+    def _run_file(self, path):
         with NamedTemporaryFile("wb") as f, NamedTemporaryFile("wb") as g:
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "r") as z:
                 z.extract(path, g.name)
-            subprocess.Popen(g.name, close_fds=True)
+            subprocess.run(["call", g.name], close_fds=True)
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
