@@ -6,6 +6,7 @@ import wx
 
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+from wx.lib.scrolledpanel import ScrolledPanel
 
 TITLE = "HiddenExplorer"
 
@@ -35,6 +36,20 @@ def decrypt(password):
     cipher2 = AES.new(password, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
+
+def get_icon(path):
+    icoX = win32api.GetSystemMetrics(win32con.SM_CXICON)
+    icoY = win32api.GetSystemMetrics(win32con.SM_CXICON)
+    large, small = win32gui.ExtractIconEx(path, 0)
+    win32gui.DestroyIcon(small[0])
+    hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
+    hbmp = win32ui.CreateBitmap()
+    hbmp.CreateCompatibleBitmap(hdc, icoX, icoX)
+    hdc = hdc.CreateCompatibleDC()
+    hdc.SelectObject(hbmp)
+    hdc.DrawIcon((0,0), large[0])
+    bmpstr = hbmp.GetBitmapBits(True)
+    return Image.frombuffer("RGBA", (32, 32), bmpstr, "raw", "BGRA", 0, 1)
 
 class FileDropTarget(wx.FileDropTarget):
     def __init__(self, func):
@@ -76,7 +91,8 @@ class MainFrame(wx.Frame):
             self.sizer.Clear(True)
         else:
             self.sizer = wx.BoxSizer()
-        self.panel = wx.Panel(self)
+        self.panel = ScrolledPanel(self)
+        self.panel.SetupScrolling()
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             for p in self.files:
@@ -115,7 +131,15 @@ class MainFrame(wx.Frame):
 
     def set_layout(self, path):
         sizer = wx.BoxSizer(wx.VERTICAL)
-        panel = wx.Panel(self.panel)
+        panel = wx.Panel(self.panel, size=(150, 120))
+        with NamedTemporaryFile("wb") as f, NamedTemporaryFile("wb") as g:
+            f.write(self.bytes)
+            with zipfile.ZipFile(f.name, "r") as z:
+                z.extract(path, g.name)
+            img = get_icon(g.name).Scale(120, 90)
+            image = wx.EmptyImage(img.size[0], img.size[1])
+            image.SetData(img.convert("RGB").tostring())
+            sizer.Add(image)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
         panel.SetSizer(sizer)
         self.psizer.Add(panel)
