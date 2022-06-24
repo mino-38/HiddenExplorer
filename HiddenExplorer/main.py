@@ -15,6 +15,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 
 TITLE = "HiddenExplorer"
 FILL = b"a"
+IV = b"aaaaaaaaaaaaaaaa"
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
 if not os.path.isdir(root):
@@ -30,18 +31,19 @@ else:
         f.write(KEY)
 
 def encrypt(file, password):
-    cipher1 = AES.new(KEY, AES.MODE_EAX)
+    file.seek(0)
+    cipher1 = AES.new(KEY, AES.MODE_EAX, IV)
     password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
-    cipher2 = AES.new(password, AES.MODE_EAX)
+    cipher2 = AES.new(password, AES.MODE_EAX, IV)
     with open(crypto_file, "wb") as g:
         g.write(cipher1.encrypt(cipher2.encrypt(file.read())))
 
 def decrypt(password):
-    cipher1 = AES.new(KEY, AES.MODE_EAX)
+    cipher1 = AES.new(KEY, AES.MODE_EAX, IV)
     with open(crypto_file, "rb") as f:
         data = cipher1.decrypt(f.read())
     password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
-    cipher2 = AES.new(password, AES.MODE_EAX)
+    cipher2 = AES.new(password, AES.MODE_EAX, IV)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
 
