@@ -1,4 +1,5 @@
 import os
+import subprocess
 import tempfile
 import zipfile
 
@@ -142,7 +143,15 @@ class MainFrame(wx.Frame):
             sizer.Add(image)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
         panel.SetSizer(sizer)
+        panel.Bind(wx.EVT_LEFT_DCLICK, lambda: self.run_file(path))
         self.psizer.Add(panel)
+
+    def run_file(self, path):
+        with NamedTemporaryFile("wb") as f, NamedTemporaryFile("wb") as g:
+            f.write(self.bytes)
+            with zipfile.ZipFile(f.name, "r") as z:
+                z.extract(path, g.name)
+            subprocess.Popen(g.name, close_fds=True)
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
