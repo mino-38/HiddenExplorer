@@ -1,4 +1,5 @@
 import os
+import time
 import shutil
 import tempfile
 import zipfile
@@ -155,17 +156,22 @@ class MainFrame(wx.Frame):
     def set_layout(self, path):
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(150, 120))
-        with tempfile.NamedTemporaryFile("wb") as f, tempfile.NamedTemporaryFile("wb") as g:
-            f.write(self.bytes)
-            with zipfile.ZipFile(f.name, "r") as z:
-                z.extract(path, g.name)
-            try:
-                img = get_icon(g.name).Scale(120, 90)
-                image = wx.EmptyImage(img.size[0], img.size[1])
-                image.SetData(img.convert("RGB").tostring())
-                sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap()))
-            except:
-                sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon))
+        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            with tempfile.TemporaryDirectory() as d:
+                with zipfile.ZipFile(temp_zip, "r") as z:
+                    z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
+                try:
+                    img = get_icon(g.name).Scale(120, 90)
+                    image = wx.EmptyImage(img.size[0], img.size[1])
+                    image.SetData(img.convert("RGB").tostring())
+                    sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap()))
+                except:
+                    sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon))
+        finally:
+            os.remove(temp_zip)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
