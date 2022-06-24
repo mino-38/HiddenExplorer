@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 import zipfile
 
@@ -142,6 +143,7 @@ class MainFrame(wx.Frame):
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
             self.password = init.password
+            
             self.bytes = decrypt(self.password)
             self.files = files
         self.Refresh()
