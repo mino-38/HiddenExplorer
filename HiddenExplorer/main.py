@@ -211,6 +211,7 @@ class AskPasswordFrame(wx.Frame):
             f.flush()
             if zipfile.is_zipfile(f.name):
                 MainFrame(bytes_, zipfile.ZipFile(f.name).namelist(), password)
+                self.Close()
             else:
                 self.error.SetLabel("パスワードが違います")
                 self.Refresh()
@@ -253,7 +254,7 @@ class InitDialog(wx.Dialog):
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
                     encrypt(z.name, self.password)
-            self.Destroy()
+            self.Close()
         else:
             self.error.SetLabel("パスワードが一致していません")
             self.Refresh()
