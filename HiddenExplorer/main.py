@@ -143,9 +143,10 @@ class MainFrame(wx.Frame):
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
             self.password = init.password
-            
             self.bytes = decrypt(self.password)
             self.files = files
+            for p in files:
+                self.set_layout(p)
         self.Refresh()
 
     def set_layout(self, path):
@@ -241,7 +242,6 @@ class InitDialog(wx.Dialog):
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
-                    self.run_func(p)
                 with tempfile.NamedTemporaryFile("wb+") as z:
                     shutil.make_archive(z.name, "zip", d)
                     shutil.move(z.name+".zip", crypto_file)
