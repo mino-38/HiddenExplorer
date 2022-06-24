@@ -40,6 +40,14 @@ def decrypt(password):
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
 
+class FileDropTarget(wx.FileDropTarget):
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+
+    def OnDropFiles(self, x, y, files):
+        self.func(files[-1])
+
 class MainFrame(wx.Frame):
     size = (800, 500)
     def __init__(self, bytes_=None, files=None, password=None):
@@ -47,6 +55,7 @@ class MainFrame(wx.Frame):
         self.bytes = bytes_
         self.files = files
         self.password = password
+        self.SetDropTarget(FileDropTarget(self.add))
         self.build()
 
     def build(self):
