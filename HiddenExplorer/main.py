@@ -94,7 +94,7 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self):
         fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
-        if dlg.ShowModal() == wx.ID_OK:
+        if fdialog.ShowModal() == wx.ID_OK:
             paths = fdialog.GetPaths()
             if paths:
                 self.add(paths)
