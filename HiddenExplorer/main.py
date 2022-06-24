@@ -39,7 +39,7 @@ def decrypt(password):
     cipher1 = AES.new(KEY, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         data = cipher1.decrypt(f.read())
-    password += FILL*(len(password) % AES.block_size)
+    password = password.encode() + FILL*(len(password) % AES.block_size)
     cipher2 = AES.new(password, AES.MODE_EAX)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(data)
