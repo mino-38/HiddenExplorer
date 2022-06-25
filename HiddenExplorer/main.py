@@ -100,7 +100,7 @@ class MainFrame(wx.Frame):
         self.files = None
         self.SetDropTarget(FileDropTarget(self.add))
         self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
-        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self.bytes, self.password, self.build).ShowModal()}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
@@ -125,6 +125,9 @@ class MainFrame(wx.Frame):
                 self.add(path)
 
     def build(self):
+        progress = wx.ProgressDialog(TITLE)
+        progress.Show()
+        progress.Pulse("描画中...")
         self.update_files()
         if hasattr(self, "sizer"):
             self.sizer.Clear(True)
@@ -142,6 +145,7 @@ class MainFrame(wx.Frame):
         self.SetSizer(self.sizer)
         self.Layout()
         self.Refresh()
+        progress.Close()
 
     def add(self, path):
         if self.bytes:
@@ -395,12 +399,13 @@ class InitDialog(wx.Dialog):
 
 class RemoveDialog(wx.Dialog):
     size = (500, 300)
-    def __init__(self, file, bytes_, password, draw):
+    def __init__(self, file, parent):
         super().__init__(None, title=TITLE, size=RemoveDialog.size)
         self.target = file
-        self.bytes = bytes_
+        self.bytes = parent.bytes
         self.password = password
-        self.draw = draw
+        self.draw = parent.build
+        self.parent = parent
         self.build()
 
     def build(self):
@@ -454,8 +459,10 @@ class RemoveDialog(wx.Dialog):
                 else:
                     shutil.rmtree(target)
             shutil.make_archive(temp_zip, "zip", d)
-            with open(temp_zip+".zip", "rb") as z:
-                encrypt(z, self.password)
+            with open(temp_zip+".zip", "rb") as f:
+                encrypt(f, self.password)
+                f.seek(0)
+                self.parent.bytes = f.read()
         self.draw()
         self.Close()
 
