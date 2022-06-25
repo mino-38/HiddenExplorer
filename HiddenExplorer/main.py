@@ -90,7 +90,7 @@ class FileDropTarget(wx.FileDropTarget):
 
 class MainFrame(wx.Frame):
     size = (800, 500)
-    def __init__(self, bytes_=None, files=None, password=None):
+    def __init__(self, bytes_=None, password=None):
         super().__init__(None, title=TITLE, size=MainFrame.size)
         self.bytes = bytes_
         self.password = password
