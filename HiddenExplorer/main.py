@@ -95,6 +95,7 @@ class MainFrame(wx.Frame):
         self.password = password
         self.SetDropTarget(FileDropTarget(self.add))
         self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: self.run_file(p, notepad=True)}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
@@ -191,6 +192,7 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon)
                     print(traceback.format_exc())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
                 sizer.Add(bmp)
         finally:
             os.remove(temp_zip)
@@ -199,17 +201,26 @@ class MainFrame(wx.Frame):
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         self.psizer.Add(panel)
 
-    def run_file(self, path):
-        threading.Thread(target=self._run_file, args=(path,)).start()
+    def show_menu(self, path):
+        menu = wx.Menu()
+        menu.Append(wx.MenuItem(menu, 1, "実行"))
+        menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
+        menu.Bind(wx.EVT_MENU, lambda e: self.run_menu(e, path))
 
-    def _run_file(self, path):
+    def run_menu(self, e, path):
+        self.menu_func[e.GetId()](path)
+
+    def run_file(self, path, notepad=False):
+        threading.Thread(target=self._run_file, args=(path, notepad)).start()
+
+    def _run_file(self, path, notepad):
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
             with zipfile.ZipFile(temp_zip, "r") as z, tempfile.TemporaryDirectory() as d:
                 file = z.extract(path, d)
-                subprocess.run(["call", file], shell=True)
+                subprocess.run(["call", "notepad.exe", file] if notepad else ["call", file], shell=True)
         finally:
             os.remove(temp_zip)
 
