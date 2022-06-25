@@ -113,7 +113,7 @@ class MainFrame(wx.Frame):
             self.sizer.Clear(True)
         else:
             self.sizer = wx.BoxSizer()
-        self.panel = ScrolledPanel(self)
+        self.panel = ScrolledPanel(self, size=MainFrame.size)
         self.panel.SetupScrolling()
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
@@ -200,7 +200,7 @@ class AskPasswordFrame(wx.Frame):
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = wx.Panel(self)
+        self.panel = wx.Panel(self, size=AskPasswordFrame.size)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerを利用するパスワードを入力してください"))
         self.ctrl = wx.TextCtrl(self.panel, size=(200, 20))
         sizer.Add(self.ctrl)
@@ -238,7 +238,7 @@ class InitDialog(wx.Dialog):
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = wx.Panel(self)
+        self.panel = wx.Panel(self, size=InitDialog.size)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerを利用するパスワードを入力してください"))
         self.ctrl1 = wx.TextCtrl(self.panel, size=(300, 20))
         sizer.Add(self.ctrl1)
