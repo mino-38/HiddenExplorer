@@ -206,7 +206,6 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path):
-        path = path.replace("\\\\", "\\")
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -218,7 +217,7 @@ class MainFrame(wx.Frame):
                     try:
                         file = z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
                     except:
-                        file = z.extract(path+os.sep, os.path.join(d, path))
+                        file = z.extract(path+"/", os.path.join(d, path))
                 try:
                     img = get_icon(file).Scale(120, 90)
                     image = wx.EmptyImage(img.size[0], img.size[1])
