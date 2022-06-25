@@ -1,4 +1,4 @@
-pip install --user -U pip setuptools pyinstaller virtualenv
+pip install --user -U pip setuptools virtualenv nuitka zstandard ordered-set
 
 virtualenv compile
 
