@@ -2,7 +2,7 @@ pip install --user -U pip setuptools pyinstaller virtualenv
 
 virtualenv compile
 
-./compile/Scripts/activate
+call ./compile/Scripts/activate
 
 pip install -U -r requirements.txt
 
