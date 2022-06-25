@@ -250,8 +250,8 @@ class MainFrame(wx.Frame):
             try:
                 with open(temp_zip, "wb") as f:
                     f.write(self.bytes)
-                    with zipfile.ZipFile(temp_zip, "r") as z:
-                        file = z.extract(path, d)
+                with zipfile.ZipFile(temp_zip, "r") as z:
+                    file = z.extract(path, d)
             finally:
                 os.remove(temp_zip)
             subprocess.run(["call", "notepad.exe", file] if notepad else ["call", file], shell=True)
