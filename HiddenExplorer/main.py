@@ -118,11 +118,14 @@ class MainFrame(wx.Frame):
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             for p in self.files:
-                self.set_layout(p)
+                if os.sep not in p:
+                    self.set_layout(p)
             self.panel.SetSizer(self.psizer)
             self.sizer.Add(self.panel)
         else:
-            self.sizer.Add(wx.StaticText(self, wx.ID_ANY, "まだ何もありません"))
+            self.psizer = wx.BoxSizer(wx.VERTICAL)
+            self.psizer.Add(wx.StaticText(self, wx.ID_ANY, "まだ何もありません"))
+            self.panel.SetSizer(self.psizer)
             self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
 
@@ -218,7 +221,7 @@ class AskPasswordFrame(wx.Frame):
             f.write(bytes_)
             f.flush()
             if zipfile.is_zipfile(f.name):
-                MainFrame(bytes_, zipfile.ZipFile(f.name).namelist(), password)
+                MainFrame(bytes_, [p for p in zipfile.ZipFile(f.name).namelist() if os.sep not in p], password)
                 self.Close()
             else:
                 self.error.SetLabel("パスワードが違います")
