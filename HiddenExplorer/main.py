@@ -375,7 +375,7 @@ class InitDialog(wx.Dialog):
         self.error = wx.StaticText(self.panel)
         self.error.SetForegroundColour("#FF0000")
         sizer.Add(self.error)
-        self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
+        self.button = wx.Button(self.panel, wx.ID_ANY, "アクセス")
         self.button.Bind(wx.EVT_BUTTON, self.set_password)
         sizer.Add(self.button)
         self.panel.SetSizer(sizer)
