@@ -183,9 +183,9 @@ class MainFrame(wx.Frame):
                 f.write(self.bytes)
             with tempfile.TemporaryDirectory() as d:
                 with zipfile.ZipFile(temp_zip, "r") as z:
-                    z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
+                    file = z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
                 try:
-                    img = get_icon(g.name).Scale(120, 90)
+                    img = get_icon(file).Scale(120, 90)
                     image = wx.EmptyImage(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tostring())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
