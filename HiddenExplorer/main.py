@@ -153,7 +153,8 @@ class MainFrame(wx.Frame):
                     shutil.rmtree(path)
                 else:
                     os.remove(path)
-                encrypt(f, self.password)
+                with open(temp_zip, "rb") as f:
+                    encrypt(f, self.password)
                 self.set_layout(path)
             finally:
                 os.remove(temp_zip)
