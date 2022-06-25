@@ -259,7 +259,6 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
-                    print(traceback.format_exc())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
                 sizer.Add(bmp)
