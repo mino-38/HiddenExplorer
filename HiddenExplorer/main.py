@@ -146,13 +146,17 @@ class MainFrame(wx.Frame):
                 with zipfile.ZipFile(temp_zip, "a") as z:
                     if isinstance(path, str):
                         z.write(path)
+                        if os.path.isdir(path):
+                            shutil.rmtree(path)
+                        else:
+                            os.remove(path)
                     else:
                         for p in path:
                             z.write(p)
-                if os.path.isdir(path):
-                    shutil.rmtree(path)
-                else:
-                    os.remove(path)
+                            if os.path.isdir(p):
+                                shutil.rmtree(p)
+                            else:
+                                os.remove(p)
                 with open(temp_zip, "rb") as f:
                     encrypt(f, self.password)
                 self.set_layout(path)
