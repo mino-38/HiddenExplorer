@@ -199,6 +199,7 @@ class MainFrame(wx.Frame):
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 30)))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+        panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel)
 
     def show_menu(self, path):
@@ -206,6 +207,7 @@ class MainFrame(wx.Frame):
         menu.Append(wx.MenuItem(menu, 1, "実行"))
         menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
         menu.Bind(wx.EVT_MENU, lambda e: self.run_menu(e, path))
+        self.PopupMenu(menu)
 
     def run_menu(self, e, path):
         self.menu_func[e.GetId()](path)
