@@ -108,7 +108,8 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_file, "ファイル")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        self.default_fileicon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "default_icon.png")).Scale(120, 90).ConvertToBitmap()
+        self.default_fileicon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "default_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.default_diricon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
         self.build()
 
     def run_menu(self, e):
@@ -232,12 +233,12 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
                 try:
-                    img = get_icon(file).resize((120, 90))
+                    img = get_icon(file).resize((90, 100))
                     image = wx.EmptyImage(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
                     print(traceback.format_exc())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
