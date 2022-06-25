@@ -4,7 +4,7 @@ virtualenv compile
 
 ./compile/Scripts/activate
 
-pip install --user -U -r requirements.txt
+pip install -U -r requirements.txt
 
 pyinstaller --clean --onefile --noconsole --add-data "./HiddenExplorer/resources;resources" --icon=./HiddenExplorer/resources/HiddenExplorer.ico -n HiddenExplorer.exe ./HiddenExplorer/main.py
 
