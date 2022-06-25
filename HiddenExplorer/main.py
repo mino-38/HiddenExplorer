@@ -219,14 +219,15 @@ class MainFrame(wx.Frame):
 
     def _run_file(self, path, notepad):
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
-        try:
-            with open(temp_zip, "wb") as f:
-                f.write(self.bytes)
-            with zipfile.ZipFile(temp_zip, "r") as z, tempfile.TemporaryDirectory() as d:
-                file = z.extract(path, d)
-                subprocess.run(["call", "notepad.exe", file] if notepad else ["call", file], shell=True)
-        finally:
-            os.remove(temp_zip)
+        with tempfile.TemporaryDirectory() as d:
+            try:
+                with open(temp_zip, "wb") as f:
+                    f.write(self.bytes)
+                    with zipfile.ZipFile(temp_zip, "r") as z:
+                        file = z.extract(path, d)
+            finally:
+                os.remove(temp_zip)
+            subprocess.run(["call", "notepad.exe", file] if notepad else ["call", file], shell=True)
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
