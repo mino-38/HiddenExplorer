@@ -118,7 +118,7 @@ class MainFrame(wx.Frame):
         else:
             fdialog = wx.FileDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
         if fdialog.ShowModal() == wx.ID_OK:
-            path = fdialog.GetPaths()
+            path = fdialog.GetPath()
             if path:
                 self.add(path)
 
