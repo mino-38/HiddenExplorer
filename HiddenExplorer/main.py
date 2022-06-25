@@ -158,9 +158,15 @@ class MainFrame(wx.Frame):
         self.panel.SetupScrolling()
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
-            for p in self.files:
-                if "/" not in p or (p.endswith("/") and p.count("/") == 1):
-                    self.set_layout(p)
+            temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            try:
+                for p in self.files:
+                    if "/" not in p or (p.endswith("/") and p.count("/") == 1):
+                        self.set_layout(p, temp_zip)
+            finally:
+                os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
         self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
@@ -239,13 +245,16 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
 
-    def set_layout(self, path):
+    def set_layout(self, path, zip=None):
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
-            with open(temp_zip, "wb") as f:
-                f.write(self.bytes)
+            if zip:
+                temp_zip = zip
+            else:
+                with open(temp_zip, "wb") as f:
+                    f.write(self.bytes)
             with tempfile.TemporaryDirectory() as d:
                 with zipfile.ZipFile(temp_zip, "r") as z:
                     try:
@@ -263,7 +272,8 @@ class MainFrame(wx.Frame):
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
                 sizer.Add(bmp)
         finally:
-            os.remove(temp_zip)
+            if not zip:
+                os.remove(temp_zip)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
