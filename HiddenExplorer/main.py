@@ -144,6 +144,9 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
+            progress = wx.ProgressDialog(TITLE)
+            progress.Show()
+            progress.Pulse("追加中...")
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             try:
                 with open(temp_zip, "wb") as f:
@@ -177,6 +180,7 @@ class MainFrame(wx.Frame):
                         self.set_layout(os.path.basename(p))
             finally:
                 os.remove(temp_zip)
+                progress.Close()
         else:
             files = [path] if isinstance(path, str) else path
             init = InitDialog(self.set_layout, files)
@@ -267,6 +271,7 @@ class MainFrame(wx.Frame):
                         file = z.extract(path, d)
                     except:
                         file = z.extract(path+"/", d)
+                    if os.path.isdir(file):
                         for p in [t for t in z.namelist() if t.startswith(file)]:
                             z.extract(p, d)
             finally:
