@@ -315,6 +315,7 @@ class AskPasswordFrame(wx.Frame):
         self.panel = wx.Panel(self, size=AskPasswordFrame.size)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerを利用するパスワードを入力してください"))
         self.ctrl = wx.TextCtrl(self.panel, size=(200, 20))
+        self.ctrl.Bind(wx.EVT_TEXT_ENTER, self.login)
         sizer.Add(self.ctrl)
         self.error = wx.StaticText(self.panel)
         self.error.SetForegroundColour("#FF0000")
