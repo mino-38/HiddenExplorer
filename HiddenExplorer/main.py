@@ -134,9 +134,11 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
-            with tempfile.NamedTemporaryFile("wb+") as f:
-                f.write(self.bytes)
-                with zipfile.ZipFile(f.name, "a") as z:
+            temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+            try:
+                with open(temp_zip, "wb") as f:
+                    f.write(self.bytes)
+                with zipfile.ZipFile(temp_zip, "a") as z:
                     if isinstance(path, str):
                         z.write(path)
                     else:
@@ -148,6 +150,8 @@ class MainFrame(wx.Frame):
                     os.remove(path)
                 encrypt(f, self.password)
                 self.set_layout(path)
+            finally:
+                os.remove(temp_zip)
         else:
             files = [path] if isinstance(path, str) else path
             init = InitDialog(self.set_layout, files)
