@@ -203,7 +203,7 @@ class MainFrame(wx.Frame):
             with zipfile.ZipFile(temp_zip, "r") as z, tempfile.TemporaryDirectory() as d:
                 file = os.path.join(d, path)
                 z.extract(path, file)
-            subprocess.run(["call", file])
+            subprocess.run(["call", file], shell=True)
         finally:
             os.remove(temp_zip)
 
