@@ -15,6 +15,7 @@ import win32con
 import win32gui
 import win32ui
 import wx
+from multiprocessing import Process
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 from PIL import Image
