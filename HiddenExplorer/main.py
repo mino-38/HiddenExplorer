@@ -443,29 +443,35 @@ class RemoveDialog(wx.Dialog):
                 self.ctrl.SetValue(directory)
 
     def run(self, e):
-        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
-        with open(temp_zip, "wb") as f:
-            f.write(self.bytes)
-        with tempfile.TemporaryDirectory() as d:
-            try:
-                with zipfile.ZipFile(temp_zip, "r") as z:
-                    z.extractall(d)
-            finally:
-                os.remove(temp_zip)
-            directory = self.ctrl.GetValue()
-            target = os.path.join(d, self.target)
-            if directory:
-                shutil.move(target, directory)
-            else:
-                if os.path.isfile(target):
-                    os.remove(target)
+        progress = wx.ProgressDialog(TITLE, "削除中...")
+        progress.Show()
+        progress.Pulse()
+        try:
+            temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            with tempfile.TemporaryDirectory() as d:
+                try:
+                    with zipfile.ZipFile(temp_zip, "r") as z:
+                        z.extractall(d)
+                finally:
+                    os.remove(temp_zip)
+                directory = self.ctrl.GetValue()
+                target = os.path.join(d, self.target)
+                if directory:
+                    shutil.move(target, directory)
                 else:
-                    shutil.rmtree(target)
-            shutil.make_archive(temp_zip, "zip", d)
-            with open(temp_zip+".zip", "rb") as f:
-                encrypt(f, self.password)
-                f.seek(0)
-                self.parent.bytes = f.read()
+                    if os.path.isfile(target):
+                        os.remove(target)
+                    else:
+                        shutil.rmtree(target)
+                shutil.make_archive(temp_zip, "zip", d)
+                with open(temp_zip+".zip", "rb") as f:
+                    encrypt(f, self.password)
+                    f.seek(0)
+                    self.parent.bytes = f.read()
+        finally:
+            progress.Close()
         self.draw()
         self.Close()
 
