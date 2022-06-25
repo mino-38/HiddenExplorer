@@ -59,6 +59,12 @@ def get_icon(path):
     bmpstr = hbmp.GetBitmapBits(True)
     return Image.frombuffer("RGBA", (32, 32), bmpstr, "raw", "BGRA", 0, 1)
 
+def textwrap(text, length):
+    if length < len(text):
+        return text[:length-3]+"..."
+    else:
+        return text
+
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
         self.func = func
@@ -176,7 +182,7 @@ class MainFrame(wx.Frame):
                     sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon))
         finally:
             os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path), 30)))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         self.psizer.Add(panel)
