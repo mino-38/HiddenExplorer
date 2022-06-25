@@ -114,17 +114,13 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self, directory=False):
         if directory:
-            fdialog = wx.DirDialog(None, TITLE, style=wx.DD_MULTIPLE)
-            paths = []
+            fdialog = wx.DirDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
         else:
-            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
+            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
         if fdialog.ShowModal() == wx.ID_OK:
-            if directory:
-                fdialog.GetPaths(paths)
-            else:
-                paths = fdialog.GetPaths()
-            if paths:
-                self.add(paths)
+            path = fdialog.GetPaths()
+            if path:
+                self.add(path)
 
     def build(self):
         self.update_files()
@@ -267,7 +263,28 @@ class MainFrame(wx.Frame):
                 os.chmod(path=file, mode=stat.S_IREAD)
                 subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
             else:
-                subprocess.run(["call", file] if os.path.isfile(file) else ["call", "%windir%\\explorer.exe", file], shell=True)
+                if os.path.isfile(file)
+                    subprocess.run(["call", file], shell=True)
+                else:
+                    processes = []
+                    def open_dir(directory):
+                        fdialog = wx.FileDialog(self, TITLE, defaultDir=directory, style=wx.FD_FILE_MUST_EXIST)
+                        if fdialog.ShowModal() == wx.ID_OK:
+                            path = fdialog.GetPath()
+                            if path:
+                                if os.path.isdir(path):
+                                    return open_dir(path)
+                                else:
+                                    p = Process(target=subprocess.run, args=(["call", path],))
+                                    p.start()
+                                    processes.append(p)
+                                    return True
+                        else:
+                            return False
+                    while open_dir(file):
+                        pass
+                    for p in processes:
+                        p.kill()
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
@@ -390,7 +407,7 @@ class RemoveDialog(wx.Dialog):
         self.SetSizer(self.sizer)
 
     def set_from_dialog(self, e):
-        fdialog = wx.DirDialog(None, TITLE)
+        fdialog = wx.DirDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
         if fdialog.ShowModal() == wx.ID_OK:
             directory = fdialog.GetPath()
             if directory:
