@@ -232,7 +232,7 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
                 try:
-                    img = get_icon(file).Scale(120, 90)
+                    img = get_icon(file).resize((120, 90))
                     image = wx.EmptyImage(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tostring())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
