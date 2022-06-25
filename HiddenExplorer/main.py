@@ -227,15 +227,19 @@ class AskPasswordFrame(wx.Frame):
     def login(self, e):
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
-        with tempfile.NamedTemporaryFile("wb") as f:
-            f.write(bytes_)
-            f.flush()
-            if zipfile.is_zipfile(f.name):
-                MainFrame(bytes_, [p for p in zipfile.ZipFile(f.name).namelist() if os.sep not in p], password)
+        temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp, "wb") as f:
+                f.write(bytes_)
+                f.flush()
+            if zipfile.is_zipfile(temp):
+                MainFrame(bytes_, [p for p in zipfile.ZipFile(temp).namelist() if os.sep not in p], password)
                 self.Close()
             else:
                 self.error.SetLabel("パスワードが違います")
                 self.Refresh()
+        finally:
+            os.remove(temp)
 
 class InitDialog(wx.Dialog):
     size = (500, 300)
