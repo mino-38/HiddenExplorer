@@ -346,6 +346,9 @@ class RemoveDialog(wx.Dialog):
         self.button2 = wx.Button(self.panel, wx.ID_ANY, "削除")
         self.button2.Bind(wx.EVT_BUTTON, self.run)
         sizer.Add(self.button2)
+        self.panel.SetSizer(sizer)
+        self.sizer.Add(self.panel)
+        self.SetSizer(self.sizer)
 
     def set_from_dialog(self, e):
         fdialog = wx.DirDialog(None, TITLE)
