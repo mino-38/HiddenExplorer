@@ -97,7 +97,7 @@ class MainFrame(wx.Frame):
         self.password = password
         self.SetDropTarget(FileDropTarget(self.add))
         self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
-        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True)}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self.bytes, self.password)}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
@@ -113,9 +113,9 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self, directory=False):
         if directory:
-            fdialog = wx.DirDialog(None, TITLE, style=wx.FD_OPEN | wx.DD_MULTIPLE)
+            fdialog = wx.DirDialog(None, TITLE, style=wx.DD_MULTIPLE)
         else:
-            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_OPEN | wx.FD_MULTIPLE)
+            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
         if fdialog.ShowModal() == wx.ID_OK:
             paths = fdialog.GetPaths()
             if paths:
@@ -208,6 +208,8 @@ class MainFrame(wx.Frame):
         menu = wx.Menu()
         menu.Append(wx.MenuItem(menu, 1, "実行"))
         menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
+        menu.AppendSeparator()
+        menu.Append(wx.MenuItem(menu, 3, "削除"))
         menu.Bind(wx.EVT_MENU, lambda e: self.run_menu(e, path))
         self.PopupMenu(menu)
 
@@ -314,6 +316,67 @@ class InitDialog(wx.Dialog):
         else:
             self.error.SetLabel("パスワードが一致していません")
             self.Refresh()
+
+class RemoveDialog(wx.Dialog):
+    size = (500, 300)
+    def __init__(self, file, bytes_, password):
+        super().__init__(None, title=TITLE, size=RemoveDialog.size)
+        self.target = file
+        self.bytes = bytes_
+        self.password = password
+        self.build()
+
+    def build(self):
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.panel = wx.Panel(self, size=RemoveDialog.size)
+        text = wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerから{}を削除します".format(self.target))
+        text.Wrap(300)
+        sizer.Add(text)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, ""))
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "このファイルの移動先のディレクトリを指定してください(移動しない場合は空欄)"))
+        sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.ctrl = wx.TextCtrl(self.panel, size=(300, 20))
+        sizer2.Add(self.ctrl)
+        self.button1 = wx.Button(self.panel, wx.ID_ANY, "参照")
+        self.button1.Bind(wx.EVT_BUTTON, self.set_from_dialog)
+        sizer2.Add(self.button1)
+        sizer.Add(sizer2)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, ""))
+        self.button2 = wx.Button(self.panel, wx.ID_ANY, "削除")
+        self.button2.Bind(wx.EVT_BUTTON, self.run)
+        sizer.Add(self.button2)
+
+    def set_from_dialog(self, e):
+        fdialog = wx.DirDialog(None, TITLE)
+        if fdialog.ShowModal() == wx.ID_OK:
+            directory = fdialog.GetPath()
+            if directory:
+                self.ctrl.SetValue(directory)
+
+    def run(self, e):
+        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        with open(temp_zip, "wb") as f:
+            f.write(self.bytes)
+        with tempfile.TemporaryDirectory() as d:
+            try:
+                with zipfile.ZipFile(temp_zip, "r") as z:
+                    z.extractall(d)
+            finally:
+                os.remove(temp_zip)
+            directory = self.ctrl.GetValue()
+            target = os.path.join(d, self.target)
+            if directory:
+                shutil.move(target, directory)
+            else:
+                if os.path.isfile(target):
+                    os.remove(target)
+                else:
+                    shutil.rmtree(target)
+            shutil.make_archive(temp_zip, "zip", d)
+            with open(temp_zip+".zip", "rb") as z:
+                encrypt(z, self.password)
+        self.Close()
 
 def main():
     app = wx.App()
