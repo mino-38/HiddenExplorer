@@ -260,11 +260,11 @@ class MainFrame(wx.Frame):
                     file = z.extract(path, d)
             finally:
                 os.remove(temp_zip)
-            if notepad:
+            if notepad and os.path.isfile(file):
                 os.chmod(path=file, mode=stat.S_IREAD)
                 subprocess.run(["call", "notepad.exe", file], shell=True)
             else:
-                subprocess.run(["call", file], shell=True)
+                subprocess.run(["call", file] if os.path.isfile(file) else ["call", "%windir%\explorer.exe", file], shell=True)
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
