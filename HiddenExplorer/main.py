@@ -293,7 +293,7 @@ class MainFrame(wx.Frame):
                                 if os.path.isdir(path):
                                     return open_dir(path)
                                 else:
-                                    p = Process(target=subprocess.run, args=(["call", path],))
+                                    p = Process(target=subprocess.run, args=(["call", path],), kwargs={"shell": True})
                                     p.start()
                                     processes.append(p)
                                     return True
