@@ -93,11 +93,10 @@ class MainFrame(wx.Frame):
     def __init__(self, bytes_=None, files=None, password=None):
         super().__init__(None, title=TITLE, size=MainFrame.size)
         self.bytes = bytes_
-        self.files = files
         self.password = password
         self.SetDropTarget(FileDropTarget(self.add))
         self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
-        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self.bytes, self.password).ShowModal()}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self.bytes, self.password, self.build).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
@@ -122,6 +121,7 @@ class MainFrame(wx.Frame):
                 self.add(paths)
 
     def build(self):
+        self.update_files()
         if hasattr(self, "sizer"):
             self.sizer.Clear(True)
         else:
@@ -173,7 +173,20 @@ class MainFrame(wx.Frame):
                     self.set_layout(os.path.basename(p))
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel)
+        self.update_files()
         self.Refresh()
+
+    def update_files(self):
+        if not self.bytes:
+            return
+        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            with zipfile.ZipFile(temp_zip, "a") as z:
+                self.files = [p for p in z.namelist() if p.count(os.sep) < 2]
+        finally:
+            os.remove(temp_zip)
 
     def set_layout(self, path):
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -319,11 +332,12 @@ class InitDialog(wx.Dialog):
 
 class RemoveDialog(wx.Dialog):
     size = (500, 300)
-    def __init__(self, file, bytes_, password):
+    def __init__(self, file, bytes_, password, draw):
         super().__init__(None, title=TITLE, size=RemoveDialog.size)
         self.target = file
         self.bytes = bytes_
         self.password = password
+        self.draw = draw
         self.build()
 
     def build(self):
@@ -379,6 +393,7 @@ class RemoveDialog(wx.Dialog):
             shutil.make_archive(temp_zip, "zip", d)
             with open(temp_zip+".zip", "rb") as z:
                 encrypt(z, self.password)
+        self.draw()
         self.Close()
 
 def main():
