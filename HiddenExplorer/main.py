@@ -139,6 +139,8 @@ class MainFrame(wx.Frame):
             self.panel.SetSizer(self.psizer)
         self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
+        self.Layout()
+        self.Refresh()
 
     def add(self, path):
         if self.bytes:
