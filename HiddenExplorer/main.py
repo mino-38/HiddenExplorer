@@ -259,6 +259,9 @@ class MainFrame(wx.Frame):
                     f.write(self.bytes)
                 with zipfile.ZipFile(temp_zip, "r") as z:
                     file = z.extract(path, d)
+                    if os.path.isdir(file):
+                        for p in [t for t in z.namelist() if t.startswith(file)]
+                            z.extract(p, d)
             finally:
                 os.remove(temp_zip)
             if notepad and os.path.isfile(file):
