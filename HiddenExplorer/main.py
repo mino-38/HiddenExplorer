@@ -84,7 +84,8 @@ class FileDropTarget(wx.FileDropTarget):
         self.func = func
 
     def OnDropFiles(self, x, y, files):
-        self.func(files[-1])
+        self.func(files[0])
+        return True
 
 class MainFrame(wx.Frame):
     size = (800, 500)
