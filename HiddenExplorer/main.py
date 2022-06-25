@@ -166,7 +166,7 @@ class MainFrame(wx.Frame):
                     self.set_layout(os.path.basename(path))
                 else:
                     for p in path:
-                        self.set_layout(os.path.basename(path))
+                        self.set_layout(os.path.basename(p))
             finally:
                 os.remove(temp_zip)
         else:
