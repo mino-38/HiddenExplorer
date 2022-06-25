@@ -187,8 +187,8 @@ class MainFrame(wx.Frame):
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel)
         self.update_files()
+        self.Layout()
         self.Refresh()
-        self.Update()
 
     def update_files(self):
         if not self.bytes:
