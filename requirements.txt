@@ -1,4 +1,4 @@
 wxpython
 pycryptodome
 Pillow
-pywin32==228
+pywin32
