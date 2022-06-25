@@ -1,6 +1,7 @@
 import glob
 import os
 import stat
+import sys
 import subprocess
 import time
 import threading
@@ -23,6 +24,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 TITLE = "HiddenExplorer"
 FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
+RESOURCE = os.path.join(os.path.dirname(sys._MEIPASS if hasattr(sys, "_MEIPASS") else __file__), "resources")
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
 if not os.path.isdir(root):
@@ -107,9 +109,9 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_file, "ファイル")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        self.default_fileicon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "default_icon.png")).Scale(90, 100).ConvertToBitmap()
-        self.default_diricon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
-        self.icon = wx.Icon(os.path.join(os.path.dirname(__file__), "resources", "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.tbi = wx.adv.TaskBarIcon()
         self.tbi.SetIcon(self.icon, TITLE)
