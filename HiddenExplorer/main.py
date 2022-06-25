@@ -416,7 +416,7 @@ class RemoveDialog(wx.Dialog):
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = wx.Panel(self, size=RemoveDialog.size)
         text = wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerから{}を削除します".format(self.target))
-        text.Wrap(300)
+        text.Wrap(400)
         sizer.Add(text, flag=wx.ALIGN_CENTER)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, ""))
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "このファイルの移動先のディレクトリを指定してください(移動しない場合は空欄)"), flag=wx.ALIGN_CENTER)
