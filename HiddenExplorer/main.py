@@ -146,14 +146,14 @@ class MainFrame(wx.Frame):
                     f.write(self.bytes)
                 with zipfile.ZipFile(temp_zip, "a") as z:
                     if isinstance(path, str):
-                        z.write(path)
+                        z.write(path, os.path.basename(path))
                         if os.path.isdir(path):
                             shutil.rmtree(path)
                         else:
                             os.remove(path)
                     else:
                         for p in path:
-                            z.write(p)
+                            z.write(p, os.path.basename(p))
                             if os.path.isdir(p):
                                 shutil.rmtree(p)
                             else:
