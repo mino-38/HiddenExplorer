@@ -234,7 +234,7 @@ class MainFrame(wx.Frame):
                 try:
                     img = get_icon(file).resize((120, 90))
                     image = wx.EmptyImage(img.size[0], img.size[1])
-                    image.SetData(img.convert("RGB").tostring())
+                    image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon)
