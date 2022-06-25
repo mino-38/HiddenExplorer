@@ -110,7 +110,28 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.run_menu)
         self.default_fileicon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "default_icon.png")).Scale(90, 100).ConvertToBitmap()
         self.default_diricon = wx.Image(os.path.join(os.path.dirname(__file__), "resources", "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.icon = wx.Icon(os.path.join(os.path.dirname(__file__), "resources", "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
+        self.tbi = wx.adv.TaskBarIcon()
+        self.tbi.SetIcon(self.icon, TITLE)
+        self.tbi.Bind(wx.adv.EVT_TASKBAR_LEFT_UP, self.OnTbiLeftUp)
+        self.tbi.Bind(wx.adv.EVT_TASKBAR_RIGHT_DCLICK, self.OnTbiRightDclicked)
+        self.Bind(wx.EVT_ICONIZE, self.OnIconized)
         self.build()
+
+    def OnTbiLeftUp(self, e):
+        self.Iconize(False)
+        self.Show(True)
+        self.Raise()
+        self.tbi.RemoveIcon()
+
+    def OnTbiRightDclicked(self, e):
+        self.tbi.RemoveIcon()
+        wx.GetApp().ExitMainLoop()
+
+    def OnIconized(self, e):
+        self.Hide()
+        self.tbi.SetIcon(self.icon, TITLE)
 
     def run_menu(self, e):
         self.func[e.GetId()]()
