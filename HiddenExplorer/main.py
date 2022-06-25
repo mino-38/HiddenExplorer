@@ -153,7 +153,7 @@ class MainFrame(wx.Frame):
                         z.write(path, os.path.basename(path))
                         if os.path.isdir(path):
                             for q in glob.iglob(os.path.join(path, "**"), recursive=True):
-                                z.write(q, os.path.join(os.path.basename(path), os.path.relpath(q, path)))
+                                z.write(q, "/".join([os.path.basename(path), os.path.relpath(q, path)])))
                             shutil.rmtree(path)
                         else:
                             os.remove(path)
