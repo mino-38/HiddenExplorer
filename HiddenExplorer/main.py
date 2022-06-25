@@ -204,7 +204,7 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path):
-        path = re.sub(r"\\+", r"\", path)
+        path = re.sub("\\\\+", "\\", path)
         sizer = wx.BoxSizer(wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
