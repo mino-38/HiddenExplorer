@@ -15,7 +15,7 @@ from PIL import Image
 from wx.lib.scrolledpanel import ScrolledPanel
 
 TITLE = "HiddenExplorer"
-FILL = b"a"
+FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
