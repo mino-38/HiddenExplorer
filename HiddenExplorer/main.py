@@ -223,10 +223,10 @@ class MainFrame(wx.Frame):
         menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
         menu.AppendSeparator()
         menu.Append(wx.MenuItem(menu, 3, "削除"))
-        menu.Bind(wx.EVT_MENU, lambda e: self.run_menu(e, path))
+        menu.Bind(wx.EVT_MENU, lambda e: self.run_popupmenu(e, path))
         self.PopupMenu(menu)
 
-    def run_menu(self, e, path):
+    def run_popupmenu(self, e, path):
         self.menu_func[e.GetId()](path)
 
     def run_file(self, path, notepad=False):
