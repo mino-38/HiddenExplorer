@@ -125,9 +125,9 @@ class MainFrame(wx.Frame):
                 self.add(path)
 
     def build(self):
-        progress = wx.ProgressDialog(TITLE)
+        progress = wx.ProgressDialog(TITLE, "描画中...")
         progress.Show()
-        progress.Pulse("描画中...")
+        progress.Pulse()
         self.update_files()
         if hasattr(self, "sizer"):
             self.sizer.Clear(True)
@@ -149,9 +149,9 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
-            progress = wx.ProgressDialog(TITLE)
+            progress = wx.ProgressDialog(TITLE, "追加中...")
             progress.Show()
-            progress.Pulse("追加中...")
+            progress.Pulse()
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             try:
                 with open(temp_zip, "wb") as f:
