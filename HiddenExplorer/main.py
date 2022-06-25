@@ -233,7 +233,7 @@ class AskPasswordFrame(wx.Frame):
                 f.write(bytes_)
                 f.flush()
             if zipfile.is_zipfile(temp):
-                MainFrame(bytes_, [p for p in zipfile.ZipFile(temp).namelist() if os.sep not in p], password)
+                MainFrame(bytes_, [p for p in zipfile.ZipFile(temp).namelist() if os.sep not in p], password).Show()
                 self.Close()
             else:
                 self.error.SetLabel("パスワードが違います")
