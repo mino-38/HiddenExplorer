@@ -215,7 +215,10 @@ class MainFrame(wx.Frame):
                 f.write(self.bytes)
             with tempfile.TemporaryDirectory() as d:
                 with zipfile.ZipFile(temp_zip, "r") as z:
-                    file = z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
+                    try:
+                        file = z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
+                    except:
+                        file = z.extract(path+os.sep, os.path.join(d, path))
                 try:
                     img = get_icon(file).Scale(120, 90)
                     image = wx.EmptyImage(img.size[0], img.size[1])
