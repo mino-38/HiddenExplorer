@@ -134,7 +134,7 @@ class MainFrame(wx.Frame):
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             for p in self.files:
-                if p.count(os.sep) < 2:
+                if p.endswith("/") and p.count("/") < 2:
                     self.set_layout(p)
             self.panel.SetSizer(self.psizer)
         self.sizer.Add(self.panel)
