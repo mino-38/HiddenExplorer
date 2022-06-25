@@ -334,6 +334,8 @@ class AskPasswordFrame(wx.Frame):
 
     def login(self, e):
         self.button.Disable()
+        self.Refresh()
+        self.Update()
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
         temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
