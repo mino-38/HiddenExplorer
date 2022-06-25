@@ -1,5 +1,6 @@
 import os
 import time
+import threading
 import shutil
 import tempfile
 import zipfile
@@ -159,7 +160,7 @@ class MainFrame(wx.Frame):
                 self.bytes = decrypt(self.password)
                 self.files = files
                 for p in files:
-                    self.set_layout(p)
+                    self.set_layout(os.path.basename(p))
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel)
         self.Refresh()
@@ -173,17 +174,19 @@ class MainFrame(wx.Frame):
                 f.write(self.bytes)
             with tempfile.TemporaryDirectory() as d:
                 with zipfile.ZipFile(temp_zip, "r") as z:
-                    z.extract(os.path.basename(path), os.path.join(d, os.path.splitext(path)[1]))
+                    z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
                 try:
                     img = get_icon(g.name).Scale(120, 90)
                     image = wx.EmptyImage(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tostring())
-                    sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap()))
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    sizer.Add(wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon))
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon)
+                bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+                sizer.Add(bmp)
         finally:
             os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path), 30)))
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 30)))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         self.psizer.Add(panel)
