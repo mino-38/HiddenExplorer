@@ -134,7 +134,7 @@ class MainFrame(wx.Frame):
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             for p in self.files:
-                if p.endswith("/") and p.count("/") < 2:
+                if "/" not in p or (p.endswith("/") and p.count("/") == 1):
                     self.set_layout(p)
             self.panel.SetSizer(self.psizer)
         self.sizer.Add(self.panel)
@@ -272,7 +272,7 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", d)
                     if os.path.isdir(file):
-                        for p in [t for t in z.namelist() if t.startswith(file)]:
+                        for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
                             z.extract(p, d)
             finally:
                 os.remove(temp_zip)
@@ -327,6 +327,7 @@ class AskPasswordFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def login(self, e):
+        secf.button.Disable()
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
         temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -339,6 +340,7 @@ class AskPasswordFrame(wx.Frame):
                 self.Close()
             else:
                 self.error.SetLabel("パスワードが違います")
+                self.button.Enable()
                 self.Refresh()
         finally:
             os.remove(temp)
