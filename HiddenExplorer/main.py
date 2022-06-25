@@ -189,7 +189,7 @@ class MainFrame(wx.Frame):
             f.write(self.bytes)
             with zipfile.ZipFile(f.name, "r") as z:
                 z.extract(path, g.name)
-            subprocess.run(["call", g.name], close_fds=True)
+            subprocess.run(["call", g.name])
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
