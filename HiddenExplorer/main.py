@@ -263,7 +263,7 @@ class MainFrame(wx.Frame):
                 os.chmod(path=file, mode=stat.S_IREAD)
                 subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
             else:
-                if os.path.isfile(file)
+                if os.path.isfile(file):
                     subprocess.run(["call", file], shell=True)
                 else:
                     processes = []
