@@ -115,9 +115,9 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self, directory=False):
         if directory:
-            fdialog = wx.DirDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
+            fdialog = wx.DirDialog(None, TITLE)
         else:
-            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
+            fdialog = wx.FileDialog(None, TITLE)
         if fdialog.ShowModal() == wx.ID_OK:
             path = fdialog.GetPath()
             if path:
@@ -275,7 +275,7 @@ class MainFrame(wx.Frame):
                 else:
                     processes = []
                     def open_dir(directory):
-                        fdialog = wx.FileDialog(self, TITLE, defaultDir=directory, style=wx.FD_FILE_MUST_EXIST)
+                        fdialog = wx.FileDialog(self, TITLE, defaultDir=directory)
                         if fdialog.ShowModal() == wx.ID_OK:
                             path = fdialog.GetPath()
                             if path:
@@ -414,7 +414,7 @@ class RemoveDialog(wx.Dialog):
         self.SetSizer(self.sizer)
 
     def set_from_dialog(self, e):
-        fdialog = wx.DirDialog(None, TITLE, style=wx.FD_FILE_MUST_EXIST)
+        fdialog = wx.DirDialog(None, TITLE)
         if fdialog.ShowModal() == wx.ID_OK:
             directory = fdialog.GetPath()
             if directory:
