@@ -259,8 +259,10 @@ class MainFrame(wx.Frame):
                 with open(temp_zip, "wb") as f:
                     f.write(self.bytes)
                 with zipfile.ZipFile(temp_zip, "r") as z:
-                    file = z.extract(path, d)
-                    if os.path.isdir(file):
+                    try:
+                        file = z.extract(path, d)
+                    except:
+                        file = z.extract(path+"/", d)
                         for p in [t for t in z.namelist() if t.startswith(file)]:
                             z.extract(p, d)
             finally:
