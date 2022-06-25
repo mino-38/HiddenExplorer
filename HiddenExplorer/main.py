@@ -1,3 +1,5 @@
+import traceback
+
 import os
 import subprocess
 import time
@@ -187,6 +189,7 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon)
+                    print(traceback.format_exc())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 sizer.Add(bmp)
         finally:
