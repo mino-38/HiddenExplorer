@@ -1,5 +1,3 @@
-import traceback
-
 import glob
 import os
 import stat
@@ -15,6 +13,7 @@ import win32con
 import win32gui
 import win32ui
 import wx
+import wx.adv
 from multiprocessing import Process
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
