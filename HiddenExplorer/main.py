@@ -159,7 +159,13 @@ class MainFrame(wx.Frame):
                                 os.remove(p)
                 with open(temp_zip, "rb") as f:
                     encrypt(f, self.password)
-                self.set_layout(path)
+                    f.seek(0)
+                    self.bytes = f.read()
+                if isinstance(path, str):
+                    self.set_layout(path)
+                else:
+                    for p rn path:
+                        self.set_layout(p)
             finally:
                 os.remove(temp_zip)
         else:
