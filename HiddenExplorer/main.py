@@ -150,7 +150,6 @@ class MainFrame(wx.Frame):
     def build(self):
         progress = wx.ProgressDialog(TITLE, "描画中...")
         progress.Show()
-        progress.Pulse()
         self.update_files()
         if hasattr(self, "sizer"):
             self.sizer.Clear(True)
@@ -164,9 +163,10 @@ class MainFrame(wx.Frame):
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
             try:
-                for p in self.files:
+                for n, p in enumerate(self.files, start=1):
                     if "/" not in p or (p.endswith("/") and p.count("/") == 1):
                         self.set_layout(p, temp_zip)
+                    progress.Update(round((n / len(self.files))*100))
             finally:
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
