@@ -214,7 +214,7 @@ class MainFrame(wx.Frame):
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
             with zipfile.ZipFile(temp_zip, "a") as z:
-                self.files = [p for p in z.namelist() if p.count(os.sep) < 2]
+                self.files = [p for p in set(z.namelist()) if p.count(os.sep) < 2]
         finally:
             os.remove(temp_zip)
 
@@ -405,7 +405,7 @@ class RemoveDialog(wx.Dialog):
         super().__init__(None, title=TITLE, size=RemoveDialog.size)
         self.target = file
         self.bytes = parent.bytes
-        self.password = password
+        self.password = parent.password
         self.draw = parent.build
         self.parent = parent
         self.build()
