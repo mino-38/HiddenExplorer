@@ -195,11 +195,16 @@ class MainFrame(wx.Frame):
         threading.Thread(target=self._run_file, args=(path,)).start()
 
     def _run_file(self, path):
-        with NamedTemporaryFile("wb") as f, NamedTemporaryFile("wb") as g:
-            f.write(self.bytes)
-            with zipfile.ZipFile(f.name, "r") as z:
-                z.extract(path, g.name)
-            subprocess.run(["call", g.name])
+        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            with zipfile.ZipFile(temp_zip, "r") as z, tempfile.TemporaryDirectory() as d:
+                file = os.path.join(d, path)
+                z.extract(path, file)
+            subprocess.run(["call", file])
+        finally:
+            os.remove(temp_zip)
 
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
