@@ -120,14 +120,14 @@ class MainFrame(wx.Frame):
             for p in self.files:
                 if os.sep not in p:
                     self.set_layout(p)
-            self.panel.SetSizerAndFit(self.psizer)
+            self.panel.SetSizer(self.psizer)
             self.sizer.Add(self.panel)
         else:
             self.psizer = wx.BoxSizer(wx.VERTICAL)
             self.psizer.Add(wx.StaticText(self, wx.ID_ANY, "まだ何もありません"))
-            self.panel.SetSizerAndFit(self.psizer)
+            self.panel.SetSizer(self.psizer)
             self.sizer.Add(self.panel)
-        self.SetSizerAndFit(self.sizer)
+        self.SetSizer(self.sizer)
 
     def add(self, path):
         if self.bytes:
@@ -177,7 +177,7 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(os.path.basename(path))))
-        panel.SetSizerAndFit(sizer)
+        panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         self.psizer.Add(panel)
 
@@ -210,9 +210,9 @@ class AskPasswordFrame(wx.Frame):
         self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
         self.button.Bind(wx.EVT_BUTTON, self.login)
         sizer.Add(self.button)
-        self.panel.SetSizerAndFit(sizer)
+        self.panel.SetSizer(sizer)
         self.sizer.Add(self.panel)
-        self.SetSizerAndFit(self.sizer)
+        self.SetSizer(self.sizer)
 
     def login(self, e):
         password = self.ctrl.GetValue()
@@ -251,9 +251,9 @@ class InitDialog(wx.Dialog):
         self.button = wx.Button(self.panel, wx.ID_ANY, "決定")
         self.button.Bind(wx.EVT_BUTTON, self.set_password)
         sizer.Add(self.button)
-        self.panel.SetSizerAndFit(sizer)
+        self.panel.SetSizer(sizer)
         self.sizer.Add(self.panel)
-        self.SetSizerAndFit(self.sizer)
+        self.SetSizer(self.sizer)
 
     def set_password(self, e):
         self.password = self.ctrl1.GetValue()
