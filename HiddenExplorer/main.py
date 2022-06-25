@@ -164,7 +164,7 @@ class MainFrame(wx.Frame):
                 if isinstance(path, str):
                     self.set_layout(path)
                 else:
-                    for p rn path:
+                    for p in path:
                         self.set_layout(p)
             finally:
                 os.remove(temp_zip)
