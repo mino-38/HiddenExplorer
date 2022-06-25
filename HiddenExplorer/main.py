@@ -245,7 +245,7 @@ class MainFrame(wx.Frame):
                 sizer.Add(bmp)
         finally:
             os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER)
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)))
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
