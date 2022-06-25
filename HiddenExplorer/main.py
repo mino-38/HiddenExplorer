@@ -127,12 +127,7 @@ class MainFrame(wx.Frame):
                 if os.sep not in p:
                     self.set_layout(p)
             self.panel.SetSizer(self.psizer)
-            self.sizer.Add(self.panel)
-        else:
-            self.psizer = wx.BoxSizer(wx.VERTICAL)
-            self.psizer.Add(wx.StaticText(self, wx.ID_ANY, "まだ何もありません"))
-            self.panel.SetSizer(self.psizer)
-            self.sizer.Add(self.panel)
+        self.sizer.Add(self.panel)
         self.SetSizer(self.sizer)
 
     def add(self, path):
@@ -156,11 +151,17 @@ class MainFrame(wx.Frame):
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
             if hasattr(init, "password"):
+                self.sizer.Clear(True)
+                self.panel = ScrolledPanel(self, size=MainFrame.size)
+                self.panel.SetupScrolling()
+                self.psizer = wx.GridSizer(cols=4)
                 self.password = init.password
                 self.bytes = decrypt(self.password)
                 self.files = files
                 for p in files:
                     self.set_layout(p)
+                self.panel.SetSizer(self.psizer)
+                self.sizer.Add(self.panel)
         self.Refresh()
 
     def set_layout(self, path):
