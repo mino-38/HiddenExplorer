@@ -257,7 +257,7 @@ class MainFrame(wx.Frame):
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
-                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
+                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
                 sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
@@ -268,10 +268,10 @@ class MainFrame(wx.Frame):
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
 
-    def show_menu(self, path):
+    def show_menu(self, path, directory=False):
         menu = wx.Menu()
         menu.Append(wx.MenuItem(menu, 1, "実行"))
-        menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
+        menu.Append(wx.MenuItem(menu, 2, "ファイルエクスプローラーで開く" if directory else "メモ帳で開く"))
         menu.AppendSeparator()
         menu.Append(wx.MenuItem(menu, 3, "削除"))
         menu.Bind(wx.EVT_MENU, lambda e: self.run_popupmenu(e, path))
@@ -284,6 +284,8 @@ class MainFrame(wx.Frame):
         threading.Thread(target=self._run_file, args=(path, notepad)).start()
 
     def _run_file(self, path, notepad):
+        if not os.path.splitext(path)[1]:
+            notepad = True
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         with tempfile.TemporaryDirectory() as d:
             try:
