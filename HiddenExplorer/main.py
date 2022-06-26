@@ -125,7 +125,8 @@ class MainFrame(wx.Frame):
 
     def resize_panel(self, e):
         if hasattr(self, "panel"):
-            self.panel.SetSize(self.Size)
+            height = self.psizer.GetEffectiveRowsCount()*130
+            self.panel.SetSize(self.Size.width, height if self.Size.height < height else self.Size.height)
             self.Refresh()
 
     def run_menu(self, e):
@@ -166,7 +167,7 @@ class MainFrame(wx.Frame):
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
         height = self.psizer.GetEffectiveRowsCount()*130
-        self.panel.SetSize(800, height if self.Size.height < height else self.Size.height)
+        self.panel.SetSize(self.Size.width, height if self.Size.height < height else self.Size.height)
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
@@ -231,7 +232,7 @@ class MainFrame(wx.Frame):
                 self.sizer.Add(self.panel, proportion=1)
         self.update_files()
         height = self.psizer.GetEffectiveRowsCount()*130
-        self.panel.SetSize(800, height if self.Size.height < height else self.Size.height)
+        self.panel.SetSize(self.Size.width, height if self.Size.height < height else self.Size.height)
         self.Layout()
         self.Refresh()
 
