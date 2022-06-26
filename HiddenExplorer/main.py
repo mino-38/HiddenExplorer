@@ -145,6 +145,7 @@ class MainFrame(wx.Frame):
 
     def build(self):
         progress = wx.ProgressDialog(TITLE, "描画中...")
+        progress.SetIcon(self.icon)
         progress.Show()
         self.update_files()
         if hasattr(self, "sizer"):
@@ -175,6 +176,7 @@ class MainFrame(wx.Frame):
     def add(self, path):
         if self.bytes:
             progress = wx.ProgressDialog(TITLE, "追加中...")
+            progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -319,7 +321,7 @@ class MainFrame(wx.Frame):
                     if is_in_assocs(file):
                         subprocess.run(["start", "/wait", file], shell=True)
                     else:
-                        wx.MessageDialog(None, "拡張子{}の関連付けがされていません\n関連付けを行ったあとに再度実行してください".format(os.path.splitext(file)[1]), TITLE, style=wx.OK | wx.YES_DEFAULT | wx.ICON_ERROR).Show()
+                        wx.MessageDialog(None, "拡張子{}の関連付けがされていません\n関連付けを行ったあとに再度実行してください".format(os.path.splitext(file)[1]), TITLE, style=wx.OK | wx.YES_DEFAULT | wx.ICON_ERROR).ShowModal()
                 else:
                     processes = []
                     def open_dir(directory):
@@ -420,6 +422,7 @@ class InitDialog(wx.Dialog):
         self.password = self.ctrl1.GetValue()
         if self.password == self.ctrl2.GetValue():
             progress = wx.ProgressDialog(TITLE, "追加中...")
+            progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
             with tempfile.TemporaryDirectory() as d:
@@ -484,6 +487,7 @@ class RemoveDialog(wx.Dialog):
 
     def run(self, e):
         progress = wx.ProgressDialog(TITLE, "削除中...")
+        progress.SetIcon(self.icon)
         progress.Show()
         progress.Pulse()
         try:
