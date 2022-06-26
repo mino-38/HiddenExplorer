@@ -206,6 +206,9 @@ class MainFrame(wx.Frame):
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
             if hasattr(init, "password"):
+                progress = wx.ProgressDialog(TITLE, "追加中...")
+                progress.Show()
+                progress.Pulse()
                 self.sizer.Clear(True)
                 self.panel = ScrolledPanel(self, size=MainFrame.size)
                 self.panel.SetupScrolling()
@@ -217,6 +220,7 @@ class MainFrame(wx.Frame):
                     self.set_layout(os.path.basename(p))
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel, proportion=1)
+                progress.Close()
         self.update_files()
         self.Layout()
         self.Refresh()
