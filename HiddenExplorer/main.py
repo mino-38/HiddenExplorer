@@ -170,7 +170,7 @@ class MainFrame(wx.Frame):
             finally:
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
-        self.sizer.Add(self.panel)
+        self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
         self.Refresh()
@@ -230,7 +230,7 @@ class MainFrame(wx.Frame):
                 for p in files:
                     self.set_layout(os.path.basename(p))
                 self.panel.SetSizer(self.psizer)
-                self.sizer.Add(self.panel)
+                self.sizer.Add(self.panel, proportion=1)
         self.update_files()
         self.Layout()
         self.Refresh()
@@ -272,15 +272,15 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
-                sizer.Add(bmp)
+                sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
                 os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)))
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), proportion=1)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
-        self.psizer.Add(panel)
+        self.psizer.Add(panel, proportion=1)
 
     def show_menu(self, path):
         menu = wx.Menu()
@@ -343,7 +343,7 @@ class MainFrame(wx.Frame):
 class AskPasswordFrame(wx.Frame):
     size = (300, 200)
     def __init__(self):
-        super().__init__(None, title=TITLE, size=AskPasswordFrame.size)
+        super().__init__(None, title=TITLE, size=AskPasswordFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.build()
 
     def build(self):
@@ -386,7 +386,7 @@ class AskPasswordFrame(wx.Frame):
 class InitDialog(wx.Dialog):
     size = (500, 300)
     def __init__(self, func, files):
-        super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size)
+        super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.run_func = func
         self.files = files
         self.build()
@@ -432,7 +432,7 @@ class InitDialog(wx.Dialog):
 class RemoveDialog(wx.Dialog):
     size = (500, 300)
     def __init__(self, file, parent):
-        super().__init__(None, title=TITLE, size=RemoveDialog.size)
+        super().__init__(None, title=TITLE, size=RemoveDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.target = file
         self.bytes = parent.bytes
         self.password = parent.password
