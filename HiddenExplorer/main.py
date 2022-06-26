@@ -324,6 +324,8 @@ class AskPasswordFrame(wx.Frame):
     size = (300, 200)
     def __init__(self):
         super().__init__(None, title=TITLE, size=AskPasswordFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
         self.build()
 
     def build(self):
@@ -369,6 +371,8 @@ class InitDialog(wx.Dialog):
         super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.run_func = func
         self.files = files
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
         self.build()
 
     def build(self):
@@ -418,6 +422,8 @@ class RemoveDialog(wx.Dialog):
         self.password = parent.password
         self.draw = parent.build
         self.parent = parent
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
         self.build()
 
     def build(self):
