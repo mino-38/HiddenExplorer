@@ -151,7 +151,6 @@ class MainFrame(wx.Frame):
         else:
             self.sizer = wx.BoxSizer()
         self.panel = ScrolledPanel(self, size=MainFrame.size)
-        self.panel.SetupScrolling()
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -165,6 +164,7 @@ class MainFrame(wx.Frame):
             finally:
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
+            self.panel.SetupScrolling()
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
