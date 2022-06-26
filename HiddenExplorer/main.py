@@ -112,7 +112,13 @@ class MainFrame(wx.Frame):
         self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
+        self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.build()
+
+    def resize_panel(self, e):
+        if hasattr(self, "panel"):
+            self.panel.SetSize(self.Size)
+            self.Refresh()
 
     def run_menu(self, e):
         self.func[e.GetId()]()
