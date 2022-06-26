@@ -7,6 +7,7 @@ import subprocess
 import time
 import threading
 import shutil
+import signal
 import tempfile
 import zipfile
 
@@ -74,7 +75,11 @@ def textwrap(text, length):
     else:
         return text
 
-def cleanup(self, path):
+def register_on_exit(func):
+    atexit.register(func)
+    signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
+
+def cleanup(path):
     if os.path.isdir(path):
         shutil.rmtree(path)
     elif os.path.isfile(path):
@@ -121,7 +126,7 @@ class MainFrame(wx.Frame):
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.app_dir = tempfile.TemporaryDirectory()
-        atexit.register(RunFunction(cleanup, self.app_dir))
+        register_on_exit(RunFunction(cleanup, self.app_dir))
         self.build()
 
     def resize_panel(self, e):
