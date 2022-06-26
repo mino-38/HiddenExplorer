@@ -372,7 +372,7 @@ class AskPasswordFrame(wx.Frame):
             os.remove(temp)
 
 class InitDialog(wx.Dialog):
-    size = (500, 300)
+    size = (320, 200)
     def __init__(self, func, files):
         super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.run_func = func
