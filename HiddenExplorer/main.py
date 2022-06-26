@@ -1,3 +1,4 @@
+import atexit
 import glob
 import os
 import stat
@@ -73,15 +74,11 @@ def textwrap(text, length):
     else:
         return text
 
-def get_assocs():
-    values = set()
-    for r in subprocess.run(["assoc"], shell=True, stdout=subprocess.PIPE).stdout.decode().splitlines():
-        if "=" in r:
-            values.add(r.split("=")[0])
-    return values
-
-def is_in_assocs(path):
-    return os.path.splitext(path)[1] in get_assocs()
+def cleanup(self, path):
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    elif os.path.isfile(path):
+        os.remove(path)
 
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
@@ -123,6 +120,8 @@ class MainFrame(wx.Frame):
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
+        self.app_dir = tempfile.TemporaryDirectory()
+        atexit.register(RunFunction(cleanup, self.app_dir))
         self.build()
 
     def resize_panel(self, e):
@@ -299,49 +298,45 @@ class MainFrame(wx.Frame):
         if not os.path.splitext(path)[1]:
             notepad = True
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
-        with tempfile.TemporaryDirectory() as d:
-            try:
-                with open(temp_zip, "wb") as f:
-                    f.write(self.bytes)
-                with zipfile.ZipFile(temp_zip, "r") as z:
-                    try:
-                        file = z.extract(path, d)
-                    except:
-                        file = z.extract(path+"/", d)
-                    if os.path.isdir(file):
-                        for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
-                            z.extract(p, d)
-            finally:
-                os.remove(temp_zip)
-            if notepad and os.path.isfile(file):
-                os.chmod(path=file, mode=stat.S_IREAD)
-                subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
+        try:
+            with open(temp_zip, "wb") as f:
+                f.write(self.bytes)
+            with zipfile.ZipFile(temp_zip, "r") as z:
+                try:
+                    file = z.extract(path, self.app_dir)
+                except:
+                    file = z.extract(path+"/", self.app_dir)
+                if os.path.isdir(file):
+                    for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
+                        z.extract(p, self.app_dir)
+        finally:
+            os.remove(temp_zip)
+        if notepad and os.path.isfile(file):
+            os.chmod(path=file, mode=stat.S_IREAD)
+            subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
+        else:
+            if os.path.isfile(file):
+                subprocess.run(["start", "/wait", file], shell=True)
             else:
-                if os.path.isfile(file):
-                    if is_in_assocs(file):
-                        subprocess.run(["start", "/wait", file], shell=True)
+                processes = []
+                def open_dir(directory):
+                    fdialog = wx.FileDialog(self, TITLE, defaultDir=directory)
+                    if fdialog.ShowModal() == wx.ID_OK:
+                        path = fdialog.GetPath()
+                        if path:
+                            if os.path.isdir(path):
+                                return open_dir(path)
+                            else:
+                                p = Process(target=subprocess.run, args=(["start", "/wait", path],), kwargs={"shell": True})
+                                p.start()
+                                processes.append(p)
+                                return True
                     else:
-                        wx.MessageDialog(None, "拡張子{}の関連付けがされていません\n関連付けを行ったあとに再度実行してください".format(os.path.splitext(file)[1]), TITLE, style=wx.OK | wx.YES_DEFAULT | wx.ICON_ERROR).ShowModal()
-                else:
-                    processes = []
-                    def open_dir(directory):
-                        fdialog = wx.FileDialog(self, TITLE, defaultDir=directory)
-                        if fdialog.ShowModal() == wx.ID_OK:
-                            path = fdialog.GetPath()
-                            if path:
-                                if os.path.isdir(path):
-                                    return open_dir(path)
-                                else:
-                                    p = Process(target=subprocess.run, args=(["start", "/wait", path],), kwargs={"shell": True})
-                                    p.start()
-                                    processes.append(p)
-                                    return True
-                        else:
-                            return False
-                    while open_dir(file):
-                        pass
-                    for p in processes:
-                        p.kill()
+                        return False
+                while open_dir(file):
+                    pass
+                for p in processes:
+                    p.kill()
 
 class AskPasswordFrame(wx.Frame):
     size = (250, 140)
