@@ -420,7 +420,7 @@ class InitDialog(wx.Dialog):
             self.Refresh()
 
 class RemoveDialog(wx.Dialog):
-    size = (500, 300)
+    size = (500, 200)
     def __init__(self, file, parent):
         super().__init__(None, title=TITLE, size=RemoveDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.target = file
@@ -440,7 +440,7 @@ class RemoveDialog(wx.Dialog):
         text.Wrap(400)
         sizer.Add(text, flag=wx.ALIGN_CENTER)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, ""))
-        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "このファイルの移動先のディレクトリを指定してください(移動しない場合は空欄)"), flag=wx.ALIGN_CENTER)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "このファイル、またはディレクトリの移動先のディレクトリを指定してください(移動しない場合は空欄)"), flag=wx.ALIGN_CENTER)
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.ctrl = wx.TextCtrl(self.panel, size=(250, 20))
         sizer2.Add(self.ctrl)
