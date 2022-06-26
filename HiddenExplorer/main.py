@@ -24,7 +24,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 TITLE = "HiddenExplorer"
 FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
-RESOURCE = os.path.join(os.path.dirname(sys._MEIPASS if hasattr(sys, "_MEIPASS") else __file__), "resources")
+RESOURCE = os.path.join(os.path.dirname(__file__), "resources")
 
 root = os.path.join(os.environ.get("USERPROFILE"), ".HiddenExplorer")
 if not os.path.isdir(root):
