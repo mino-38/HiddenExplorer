@@ -79,12 +79,6 @@ def register_on_exit(func):
     atexit.register(func)
     signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
 
-def cleanup(path):
-    if os.path.isdir(path):
-        shutil.rmtree(path)
-    elif os.path.isfile(path):
-        os.remove(path)
-
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
         self.func = func
@@ -126,7 +120,7 @@ class MainFrame(wx.Frame):
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.app_dir = tempfile.TemporaryDirectory()
-        register_on_exit(RunFunction(cleanup, self.app_dir))
+        register_on_exit(self.app_dir.cleanup)
         self.build()
 
     def resize_panel(self, e):
@@ -308,12 +302,12 @@ class MainFrame(wx.Frame):
                 f.write(self.bytes)
             with zipfile.ZipFile(temp_zip, "r") as z:
                 try:
-                    file = z.extract(path, self.app_dir)
+                    file = z.extract(path, self.app_dir.name)
                 except:
-                    file = z.extract(path+"/", self.app_dir)
+                    file = z.extract(path+"/", self.app_dir.name)
                 if os.path.isdir(file):
                     for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
-                        z.extract(p, self.app_dir)
+                        z.extract(p, self.app_dir.name)
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
