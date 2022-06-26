@@ -206,9 +206,6 @@ class MainFrame(wx.Frame):
             init = InitDialog(self.set_layout, files)
             init.ShowModal()
             if hasattr(init, "password"):
-                progress = wx.ProgressDialog(TITLE, "追加中...")
-                progress.Show()
-                progress.Pulse()
                 self.sizer.Clear(True)
                 self.panel = ScrolledPanel(self, size=MainFrame.size)
                 self.panel.SetupScrolling()
@@ -220,7 +217,6 @@ class MainFrame(wx.Frame):
                     self.set_layout(os.path.basename(p))
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel, proportion=1)
-                progress.Close()
         self.update_files()
         self.Layout()
         self.Refresh()
@@ -410,6 +406,9 @@ class InitDialog(wx.Dialog):
     def set_password(self, e):
         self.password = self.ctrl1.GetValue()
         if self.password == self.ctrl2.GetValue():
+            progress = wx.ProgressDialog(TITLE, "追加中...")
+            progress.Show()
+            progress.Pulse()
             with tempfile.TemporaryDirectory() as d:
                 for p in self.files:
                     shutil.move(p, d)
@@ -420,6 +419,7 @@ class InitDialog(wx.Dialog):
                         encrypt(z, self.password)
                 finally:
                     os.remove(temp_zip+".zip")
+            progress.Close()
             self.Close()
         else:
             self.error.SetLabel("パスワードが一致していません")
