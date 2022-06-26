@@ -306,7 +306,7 @@ class MainFrame(wx.Frame):
                 subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
             else:
                 if os.path.isfile(file):
-                    subprocess.run(["call", file], shell=True)
+                    subprocess.run(["start", "/wait", file], shell=True)
                 else:
                     processes = []
                     def open_dir(directory):
@@ -317,7 +317,7 @@ class MainFrame(wx.Frame):
                                 if os.path.isdir(path):
                                     return open_dir(path)
                                 else:
-                                    p = Process(target=subprocess.run, args=(["call", path],), kwargs={"shell": True})
+                                    p = Process(target=subprocess.run, args=(["start", "/wait", path],), kwargs={"shell": True})
                                     p.start()
                                     processes.append(p)
                                     return True
