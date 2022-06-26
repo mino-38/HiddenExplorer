@@ -74,7 +74,7 @@ def textwrap(text, length):
         return text
 
 def get_assocs():
-    values = {}
+    values = set()
     for r in subprocess.run(["assoc"], shell=True, stdout=subprocess.PIPE).stdout.decode().splitlines():
         if "=" in r:
             values.add(r.split("=")[0])
