@@ -321,7 +321,7 @@ class MainFrame(wx.Frame):
                         p.kill()
 
 class AskPasswordFrame(wx.Frame):
-    size = (300, 200)
+    size = (250, 140)
     def __init__(self):
         super().__init__(None, title=TITLE, size=AskPasswordFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
