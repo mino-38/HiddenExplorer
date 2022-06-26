@@ -89,7 +89,7 @@ class FileDropTarget(wx.FileDropTarget):
         self.func = func
 
     def OnDropFiles(self, x, y, files):
-        self.func(files[0])
+        threading.Thread(target=self.func, args=(files[0],)).start()
         return True
 
 class MainFrame(wx.Frame):
