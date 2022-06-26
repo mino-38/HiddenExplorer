@@ -73,6 +73,16 @@ def textwrap(text, length):
     else:
         return text
 
+def get_assocs():
+    values = {}
+    for r in subprocess.run(["assoc"], shell=True, stdout=subprocess.PIPE).stdout.decode().splitlines():
+        if "=" in r:
+            values.add(r.split("=")[0])
+    return values
+
+def is_in_assocs(path):
+    return os.path.splitext(path)[1] in get_assocs()
+
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
         self.func = func
@@ -306,7 +316,10 @@ class MainFrame(wx.Frame):
                 subprocess.run(["call", "%windir%\\notepad.exe", file], shell=True)
             else:
                 if os.path.isfile(file):
-                    subprocess.run(["start", "/wait", file], shell=True)
+                    if is_in_assocs(file):
+                        subprocess.run(["start", "/wait", file], shell=True)
+                    else:
+                        wx.MessageDialog(None, "拡張子{}の関連付けがされていません\n関連付けを行ったあとに再度実行してください".format(os.path.splitext(file)[1]), TITLE, style=wx.OK | wx.YES_DEFAULT | wx.ICON_ERROR).Show()
                 else:
                     processes = []
                     def open_dir(directory):
