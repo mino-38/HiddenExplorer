@@ -165,8 +165,8 @@ class MainFrame(wx.Frame):
             finally:
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
-        size = self.psizer.GetEffectiveRowsCount()*130
-        self.panel.SetSize(800, size if MainFrame.size[1] < size else MainFrame.size[1])
+        height = self.psizer.GetEffectiveRowsCount()*130
+        self.panel.SetSize(800, height if self.Size.height < height else self.Size.height)
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
@@ -230,8 +230,8 @@ class MainFrame(wx.Frame):
                 self.panel.SetSizer(self.psizer)
                 self.sizer.Add(self.panel, proportion=1)
         self.update_files()
-        size = self.psizer.GetEffectiveRowsCount()*130
-        self.panel.SetSize(800, size if MainFrame.size[1] < size else MainFrame.size[1])
+        height = self.psizer.GetEffectiveRowsCount()*130
+        self.panel.SetSize(800, height if self.Size.height < height else self.Size.height)
         self.Layout()
         self.Refresh()
 
