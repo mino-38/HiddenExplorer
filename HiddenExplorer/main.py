@@ -125,7 +125,7 @@ class MainFrame(wx.Frame):
 
     def resize_panel(self, e):
         if hasattr(self, "panel"):
-            self.panel.SetSize(self.Size)
+            self.panel.SetSize((self.Size.width, self.Size.height-50))
             self.Refresh()
 
     def run_menu(self, e):
@@ -150,7 +150,7 @@ class MainFrame(wx.Frame):
             self.sizer.Clear(True)
         else:
             self.sizer = wx.BoxSizer()
-        self.panel = ScrolledPanel(self, size=self.Size)
+        self.panel = ScrolledPanel(self, size=(self.Size.width, self.Size.height-50))
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -164,10 +164,10 @@ class MainFrame(wx.Frame):
             finally:
                 os.remove(temp_zip)
             self.panel.SetSizer(self.psizer)
-            self.panel.SetupScrolling()
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
+        self.panel.SetupScrolling()
         self.Refresh()
         progress.Close()
 
