@@ -312,10 +312,10 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
             os.chmod(path=file, mode=stat.S_IREAD)
-            subprocess.run(["call %windir%\\notepad.exe '{}'".format(file)], shell=True)
+            subprocess.run(["call %windir%\\notepad.exe \"{}\"".format(file)], shell=True)
         else:
             if os.path.isfile(file):
-                subprocess.run("start /wait \"{}\" '{}'".format(os.path.basename(file), file), shell=True)
+                subprocess.run("start /wait \"{}\" \"{}\"".format(os.path.basename(file), file), shell=True)
             else:
                 processes = []
                 def open_dir(directory):
@@ -326,7 +326,7 @@ class MainFrame(wx.Frame):
                             if os.path.isdir(path):
                                 return open_dir(path)
                             else:
-                                p = Process(target=subprocess.run, args=("start /wait \"{}\" '{}'".format(os.path.basename(path), path),), kwargs={"shell": True})
+                                p = Process(target=subprocess.run, args=("start /wait \"{}\" \"{}\"".format(os.path.basename(path), path),), kwargs={"shell": True})
                                 p.start()
                                 processes.append(p)
                                 return True
