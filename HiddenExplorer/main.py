@@ -392,7 +392,7 @@ class AskPasswordFrame(wx.Frame):
 class InitDialog(wx.Dialog):
     size = (320, 200)
     def __init__(self, func, files):
-        super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+        super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
         self.run_func = func
         self.files = files
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
