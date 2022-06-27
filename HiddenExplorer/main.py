@@ -151,8 +151,8 @@ class MainFrame(wx.Frame):
         else:
             self.sizer = wx.BoxSizer()
         self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-60))
+        self.psizer = wx.GridSizer(cols=4)
         if self.files:
-            self.psizer = wx.GridSizer(cols=4)
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
@@ -163,7 +163,7 @@ class MainFrame(wx.Frame):
                     progress.Update(round((n / len(self.files))*100))
             finally:
                 os.remove(temp_zip)
-            self.panel.SetSizer(self.psizer)
+        self.panel.SetSizer(self.psizer)
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
