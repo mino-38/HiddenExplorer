@@ -403,7 +403,7 @@ class InitDialog(wx.Dialog):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = wx.Panel(self, size=self.Size)
-        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "パスワードを入力してください"))
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "設定するパスワードを入力してください"))
         self.ctrl1 = wx.TextCtrl(self.panel, size=(300, 20))
         sizer.Add(self.ctrl1)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "確認"))
@@ -421,7 +421,10 @@ class InitDialog(wx.Dialog):
 
     def set_password(self, e):
         self.password = self.ctrl1.GetValue()
-        if self.password == self.ctrl2.GetValue():
+        if not self.password:
+            self.error.SetLabel("設定するパスワードを入力してください")
+            self.Refresh()
+        elif self.password == self.ctrl2.GetValue():
             progress = wx.ProgressDialog(TITLE, "追加中...")
             progress.SetIcon(self.icon)
             progress.Show()
