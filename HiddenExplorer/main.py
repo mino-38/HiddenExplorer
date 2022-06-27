@@ -125,7 +125,7 @@ class MainFrame(wx.Frame):
 
     def resize_panel(self, e):
         if hasattr(self, "panel"):
-            self.panel.SetSize(self.Size)
+            self.panel.SetSize((self.Size.width-50, self.Size.height))
             self.Refresh()
 
     def run_menu(self, e):
@@ -150,7 +150,7 @@ class MainFrame(wx.Frame):
             self.sizer.Clear(True)
         else:
             self.sizer = wx.BoxSizer()
-        self.panel = ScrolledPanel(self, size=MainFrame.size)
+        self.panel = ScrolledPanel(self, size=(self.Size.width-50, self.Size.height))
         if self.files:
             self.psizer = wx.GridSizer(cols=4)
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -217,7 +217,7 @@ class MainFrame(wx.Frame):
             init.ShowModal()
             if hasattr(init, "password"):
                 self.sizer.Clear(True)
-                self.panel = ScrolledPanel(self, size=MainFrame.size)
+                self.panel = ScrolledPanel(self, size=self.Size)
                 self.panel.SetupScrolling()
                 self.psizer = wx.GridSizer(cols=4)
                 self.password = init.password
@@ -341,6 +341,7 @@ class AskPasswordFrame(wx.Frame):
     size = (250, 140)
     def __init__(self):
         super().__init__(None, title=TITLE, size=AskPasswordFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+        self.running = False
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.build()
@@ -348,7 +349,7 @@ class AskPasswordFrame(wx.Frame):
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = wx.Panel(self, size=AskPasswordFrame.size)
+        self.panel = wx.Panel(self, size=self.Size)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "パスワードを入力してください"))
         self.ctrl = wx.TextCtrl(self.panel, size=(200, 20), style=wx.TE_PROCESS_ENTER)
         self.ctrl.Bind(wx.EVT_TEXT_ENTER, self.login)
@@ -364,6 +365,9 @@ class AskPasswordFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def login(self, e):
+        if self.running:
+            return
+        self.running = True
         self.button.Disable()
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
@@ -378,6 +382,7 @@ class AskPasswordFrame(wx.Frame):
             else:
                 self.error.SetLabel("パスワードが違います")
                 self.button.Enable()
+                self.running = False
                 self.Refresh()
         finally:
             os.remove(temp)
@@ -395,7 +400,7 @@ class InitDialog(wx.Dialog):
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = wx.Panel(self, size=InitDialog.size)
+        self.panel = wx.Panel(self, size=self.Size)
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "パスワードを入力してください"))
         self.ctrl1 = wx.TextCtrl(self.panel, size=(300, 20))
         sizer.Add(self.ctrl1)
@@ -451,7 +456,7 @@ class RemoveDialog(wx.Dialog):
     def build(self):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        self.panel = wx.Panel(self, size=RemoveDialog.size)
+        self.panel = wx.Panel(self, size=self.Size)
         text = wx.StaticText(self.panel, wx.ID_ANY, "HiddenExplorerから{}を削除します".format(self.target))
         text.Wrap(400)
         sizer.Add(text, flag=wx.ALIGN_CENTER)
