@@ -1,5 +1,6 @@
 import atexit
 import glob
+import math
 import os
 import stat
 import sys
@@ -40,17 +41,20 @@ else:
     with open(key_file, "wb") as f:
         f.write(KEY)
 
+def create_password(string):
+    return string.encode() + FILL*(AES.block_size*math.ceil(len(string) / AES.block_size) - (len(string) % AES.block_size))
+
 def encrypt(file, password):
     file.seek(0)
     cipher1 = AES.new(KEY, AES.MODE_EAX, IV)
-    password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
+    password = create_password(password)
     cipher2 = AES.new(password, AES.MODE_EAX, IV)
     with open(crypto_file, "wb") as g:
         g.write(cipher1.encrypt(cipher2.encrypt(file.read())))
 
 def decrypt(password):
     cipher1 = AES.new(KEY, AES.MODE_EAX, IV)
-    password = password.encode() + FILL*(AES.block_size-(len(password) % AES.block_size))
+    password = create_password(password)
     cipher2 = AES.new(password, AES.MODE_EAX, IV)
     with open(crypto_file, "rb") as f:
         return cipher2.decrypt(cipher1.decrypt(f.read()))
