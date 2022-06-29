@@ -43,8 +43,11 @@ else:
 
 def cleanup(path):
     for p in psutil.process_iter():
-        if path in p.open_files():
-            p.terminate()
+        try:
+            if path in p.open_files():
+                p.terminate()
+        except:
+            continue
     if os.path.isfile(path):
         os.remove(path)
     elif os.path.isdir(path):
@@ -130,7 +133,7 @@ class MainFrame(wx.Frame):
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.app_dir = tempfile.TemporaryDirectory().name
-        register_on_exit(cleanup(self.app_dir))
+        register_on_exit(RunFunction(cleanup, self.app_dir))
         self.build()
 
     def resize_panel(self, e):
