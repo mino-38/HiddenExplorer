@@ -11,6 +11,7 @@ import signal
 import tempfile
 import zipfile
 
+import psutil
 import win32api
 import win32con
 import win32gui
@@ -39,6 +40,15 @@ else:
     KEY = get_random_bytes(AES.block_size*2)
     with open(key_file, "wb") as f:
         f.write(KEY)
+
+def cleanup(path):
+    for p in psutil.process_iter():
+        if path in p.open_files():
+            p.terminate()
+    if os.path.isfile(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
 
 def encrypt(file, password):
     file.seek(0)
@@ -119,8 +129,8 @@ class MainFrame(wx.Frame):
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
-        self.app_dir = tempfile.TemporaryDirectory()
-        register_on_exit(self.app_dir.cleanup)
+        self.app_dir = tempfile.TemporaryDirectory().name
+        register_on_exit(cleanup(self.app_dir))
         self.build()
 
     def resize_panel(self, e):
@@ -304,12 +314,12 @@ class MainFrame(wx.Frame):
                 f.write(self.bytes)
             with zipfile.ZipFile(temp_zip, "r") as z:
                 try:
-                    file = z.extract(path, self.app_dir.name)
+                    file = z.extract(path, self.app_dir)
                 except:
-                    file = z.extract(path+"/", self.app_dir.name)
+                    file = z.extract(path+"/", self.app_dir)
                 if os.path.isdir(file):
                     for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
-                        z.extract(p, self.app_dir.name)
+                        z.extract(p, self.app_dir)
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
