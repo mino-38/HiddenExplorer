@@ -276,11 +276,13 @@ class MainFrame(wx.Frame):
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
+        panel.Bind(wx.EVT_ENTER_WINDOW, RunFunction(panel.SetBackgroundColour, "#444444"))
+        panel.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(panel.SetBackgroundColour, wx.NullColour))
         self.psizer.Add(panel, proportion=1)
 
     def show_menu(self, path, directory=False):
         menu = wx.Menu()
-        menu.Append(wx.MenuItem(menu, 1, "実行"))
+        menu.Append(wx.MenuItem(menu, 1, "開く"))
         menu.Append(wx.MenuItem(menu, 2, "ファイルエクスプローラーで開く" if directory else "メモ帳で開く"))
         menu.AppendSeparator()
         menu.Append(wx.MenuItem(menu, 3, "削除"))
