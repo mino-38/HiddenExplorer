@@ -44,7 +44,7 @@ else:
 def cleanup(path):
     for p in psutil.process_iter():
         try:
-            if path in p.open_files():
+            if path in {q.path for q in p.open_files()}:
                 p.terminate()
         except:
             continue
