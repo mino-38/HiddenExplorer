@@ -146,11 +146,11 @@ class MainFrame(wx.Frame):
 
     def add_from_dialog(self, directory=False):
         if directory:
-            fdialog = wx.DirDialog(None, TITLE)
+            fdialog = wx.DirDialog(None, TITLE, style=wx.DD_MULTIPLE)
         else:
-            fdialog = wx.FileDialog(None, TITLE)
+            fdialog = wx.FileDialog(None, TITLE, style=wx.FD_MULTIPLE)
         if fdialog.ShowModal() == wx.ID_OK:
-            path = fdialog.GetPath()
+            path = fdialog.GetPaths([]) if directory else fdialog.GetPaths()
             if path:
                 self.add(path)
 
