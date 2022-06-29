@@ -2,3 +2,4 @@ wxpython
 pycryptodome
 Pillow
 pywin32
+psutil
