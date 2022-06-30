@@ -56,8 +56,16 @@ def cleanup(path, parent):
             with open(temp_zip, "wb") as f:
                 f.write(parent.bytes)
             with zipfile.ZipFile(temp_zip, "a") as z:
-                for p in glob.iglob(os.path.join(path, "**"), recursive=True):
-                    pass
+                for p in glob.glob(os.path.join(path, "**"), recursive=True)[1:]:
+                    z.write(p, os.path.relpath(p, path))
+            with open(temp_zip, "rb") as f:
+                encrypt(f, parent.password)
+        finally:
+            os.remove(temp_zip)
+    if os.path.isfile(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
 
 def encrypt(file, password):
     file.seek(0)
