@@ -395,7 +395,7 @@ class SettingFrame(wx.Frame):
         self.build()
 
     def build(self):
-        self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-60))
+        self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-30))
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         sizer = wx.BoxSizer(wx.VERTICAL)
         self.panel.SetupScrolling()
@@ -405,6 +405,8 @@ class SettingFrame(wx.Frame):
             chbox.SetValue(v)
             sizer.Add(chbox)
             self.boxes.append(chbox)
+        sizer.Add(wx.StaticText(self.panel))
+        sizer.Add(wx.StaticText(self.panel))
         button = wx.Button(self.panel, wx.ID_ANY, "変更")
         button.Bind(wx.EVT_BUTTON, self.save)
         sizer.Add(button)
