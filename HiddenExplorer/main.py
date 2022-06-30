@@ -47,7 +47,7 @@ def cleanup(path, parent):
     for p in psutil.process_iter():
         try:
             for q in p.open_files():
-                if ".." not in os.path.relpath(q, path):
+                if q.path.startswith(path):
                     p.kill()
         except:
             continue
