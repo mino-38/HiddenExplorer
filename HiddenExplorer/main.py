@@ -150,8 +150,8 @@ class MainFrame(wx.Frame):
         self.password = password
         self.files = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame().Show()}
-        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self).ShowModal()}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show()}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
@@ -261,7 +261,7 @@ class MainFrame(wx.Frame):
                 progress.Close()
         else:
             files = [path] if isinstance(path, str) else path
-            init = InitDialog(self.set_layout, files)
+            init = InitDialog(self, self.set_layout, files)
             init.ShowModal()
             if hasattr(init, "password"):
                 self.sizer.Clear(True)
@@ -388,8 +388,8 @@ class MainFrame(wx.Frame):
 
 class SettingFrame(wx.Frame):
     size = (500, 300)
-    def __init__(self):
-        super().__init__(None, title=TITLE, size=SettingFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+    def __init__(self, parent):
+        super().__init__(parent, title=TITLE, size=SettingFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.build()
@@ -475,8 +475,8 @@ class AskPasswordFrame(wx.Frame):
 
 class InitDialog(wx.Dialog):
     size = (320, 200)
-    def __init__(self, func, files):
-        super().__init__(None, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+    def __init__(self, parent, func, files):
+        super().__init__(parent, title=TITLE+"  初期化", size=InitDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
         self.run_func = func
         self.files = files
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
@@ -533,8 +533,8 @@ class InitDialog(wx.Dialog):
 
 class RemoveDialog(wx.Dialog):
     size = (500, 200)
-    def __init__(self, file, parent):
-        super().__init__(None, title=TITLE, size=RemoveDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+    def __init__(self, parent, file):
+        super().__init__(parent, title=TITLE, size=RemoveDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
         self.target = file
         self.bytes = parent.bytes
         self.password = parent.password
