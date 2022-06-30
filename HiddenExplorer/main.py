@@ -407,6 +407,10 @@ class SettingFrame(wx.Frame):
             self.boxes.append(chbox)
         button = wx.Button(self.panel, wx.ID_ANY, "変更")
         button.Bind(wx.EVT_BUTTON, self.save)
+        sizer.Add(button)
+        self.panel.SetSizer(sizer)
+        self.sizer.Add(self.panel)
+        self.SetSizer(self.sizer)
 
     def save(self, e):
         for n, b in enumerate(self.boxes):
