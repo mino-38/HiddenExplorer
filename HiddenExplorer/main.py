@@ -48,12 +48,7 @@ else:
         f.write(KEY)
 
 def cleanup(path, parent):
-    app = wx.App()
-    wx.CallLater(10, lambda: _cleanup(path, parent))
-    app.MainLoop()
-
-def _cleanup(path, parent):
-    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...")
+    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME) 
     progress.Pulse()
     progress.Show()
     processes = list(psutil.process_iter())
@@ -238,7 +233,7 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
-            progress = wx.ProgressDialog(TITLE, "追加中...")
+            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
             progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
@@ -528,7 +523,7 @@ class InitDialog(wx.Dialog):
             self.error.SetLabel("設定するパスワードを入力してください")
             self.Refresh()
         elif self.password == self.ctrl2.GetValue():
-            progress = wx.ProgressDialog(TITLE, "追加中...")
+            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
             progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
@@ -593,7 +588,7 @@ class RemoveDialog(wx.Dialog):
                 self.ctrl.SetValue(directory)
 
     def run(self, e):
-        progress = wx.ProgressDialog(TITLE, "削除中...")
+        progress = wx.ProgressDialog(TITLE, "削除中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
         progress.SetIcon(self.icon)
         progress.Show()
         progress.Pulse()
