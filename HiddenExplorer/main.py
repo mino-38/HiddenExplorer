@@ -108,7 +108,7 @@ def register_on_exit(func):
     signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
 
 class ConfigManager(dict):
-    configs = ["ファイル、ディレクトリの変更を保持する"]
+    configs = {"0": "ファイル、ディレクトリの変更を保持する"}
     def __init__(self):
         super().__init__()
         if os.path.isfile(config_file):
