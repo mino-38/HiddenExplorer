@@ -49,7 +49,7 @@ else:
 
 def cleanup(path, parent):
     wx.App()
-    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME) 
+    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
     progress.Pulse()
     progress.Show()
     processes = list(psutil.process_iter())
@@ -75,6 +75,7 @@ def cleanup(path, parent):
                 encrypt(f, parent.password)
         finally:
             os.remove(temp_zip)
+    progress.Update(100)
     if os.path.isfile(path):
         os.remove(path)
     elif os.path.isdir(path):
