@@ -48,7 +48,7 @@ def cleanup(path, parent):
     wx.CallLater(10, lambda: _cleanup(path, parent))
     app.MainLoop()
 
-def _cleanup(path, parent)
+def _cleanup(path, parent):
     progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...")
     progress.Pulse()
     progress.Show()
