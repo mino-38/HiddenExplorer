@@ -51,7 +51,7 @@ def cleanup(path, parent):
                     p.kill()
         except:
             continue
-    if configmanager[0]:
+    if configmanager["0"]:
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             with open(temp_zip, "wb") as f:
@@ -115,7 +115,7 @@ class ConfigManager(dict):
             with open(config_file, "r") as f:
                 self.update(json.load(f))
         else:
-            self.update({0: True})
+            self.update({"0": True})
 
     def save(self):
         with open(config_file, "w") as f:
@@ -416,7 +416,7 @@ class SettingFrame(wx.Frame):
 
     def save(self, e):
         for n, b in enumerate(self.boxes):
-            configmanager[n] = b.GetValue()
+            configmanager[str(n)] = b.GetValue()
         configmanager.save()
         self.Close()
         
