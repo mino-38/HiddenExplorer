@@ -10,6 +10,7 @@ import threading
 import shutil
 import signal
 import tempfile
+import warnings
 import zipfile
 
 import psutil
@@ -23,6 +24,9 @@ from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 from PIL import Image
 from wx.lib.scrolledpanel import ScrolledPanel
+
+warnings.simplefilter("ignore")
+
 
 TITLE = "HiddenExplorer"
 FILL = b"\r"
