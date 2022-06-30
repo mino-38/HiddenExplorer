@@ -46,8 +46,9 @@ else:
 def cleanup(path, parent):
     for p in psutil.process_iter():
         try:
-            if path in {q.path for q in p.open_files()}:
-                p.kill()
+            for q in p.open_files():
+                if q.startswith(path):
+                    p.kill()
         except:
             continue
     if configmanager[0]:
