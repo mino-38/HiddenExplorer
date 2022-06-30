@@ -361,7 +361,6 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
-            os.chmod(path=file, mode=stat.S_IREAD)
             subprocess.run(["call %windir%\\notepad.exe \"{}\"".format(file)], shell=True)
         else:
             if os.path.isfile(file):
