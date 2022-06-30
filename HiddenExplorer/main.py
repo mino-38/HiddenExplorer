@@ -149,7 +149,7 @@ class MainFrame(wx.Frame):
         self.password = password
         self.files = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: ConfigManager().Show()}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame().Show()}
         self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
