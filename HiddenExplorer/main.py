@@ -48,6 +48,7 @@ else:
         f.write(KEY)
 
 def cleanup(path, parent):
+    wx.App()
     progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME) 
     progress.Pulse()
     progress.Show()
