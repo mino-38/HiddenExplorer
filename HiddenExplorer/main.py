@@ -44,13 +44,25 @@ else:
         f.write(KEY)
 
 def cleanup(path, parent):
-    for p in psutil.process_iter():
+    app = wx.App()
+    wx.CallLater(10, lambda: _cleanup(path, parent))
+    app.MainLoop()
+
+def _cleanup(path, parent)
+    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...")
+    progress.Pulse()
+    progress.Show()
+    processes = list(psutil.process_iter())
+    length = len(processes)
+    progress.Update(0, newmsg="クリーンアップ中...")
+    for n, p in enumerate(processes, start=1):
         try:
             for q in p.open_files():
                 if q.path.startswith(path):
                     p.kill()
         except:
             continue
+        progress.Update(round(n / length * 100))
     if configmanager["0"]:
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
@@ -67,6 +79,7 @@ def cleanup(path, parent):
         os.remove(path)
     elif os.path.isdir(path):
         shutil.rmtree(path)
+    progress.Close()
 
 def encrypt(file, password):
     file.seek(0)
@@ -361,10 +374,10 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
-            subprocess.run("call %windir%\\notepad.exe \"{}\"".format(file), shell=True)
+            subprocess.run("start %windir%\\notepad.exe \"{}\"".format(file), shell=True)
         else:
             if os.path.isfile(file):
-                subprocess.run("start /wait \"{}\" \"{}\"".format(os.path.basename(file), file), shell=True)
+                subprocess.run("start \"{}\" \"{}\"".format(os.path.basename(file), file), shell=True)
             else:
                 processes = []
                 def open_dir(directory):
@@ -375,7 +388,7 @@ class MainFrame(wx.Frame):
                             if os.path.isdir(path):
                                 return open_dir(path)
                             else:
-                                p = Process(target=subprocess.run, args=("start /wait \"{}\" \"{}\"".format(os.path.basename(path), path),), kwargs={"shell": True})
+                                p = Process(target=subprocess.run, args=("start \"{}\" \"{}\"".format(os.path.basename(path), path),), kwargs={"shell": True})
                                 p.start()
                                 processes.append(p)
                                 return True
