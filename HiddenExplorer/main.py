@@ -418,6 +418,7 @@ class SettingFrame(wx.Frame):
         for n, b in enumerate(self.boxes):
             configmanager[n] = b
         configmanager.save()
+        self.Close()
         
 
 class AskPasswordFrame(wx.Frame):
