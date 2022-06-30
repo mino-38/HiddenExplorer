@@ -49,7 +49,7 @@ else:
 
 def cleanup(path, parent):
     wx.App()
-    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
+    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
     progress.Pulse()
     progress.Show()
     processes = list(psutil.process_iter())
@@ -80,7 +80,7 @@ def cleanup(path, parent):
         os.remove(path)
     elif os.path.isdir(path):
         shutil.rmtree(path)
-    progress.Close()
+    progress.Destroy()
 
 def encrypt(file, password):
     file.seek(0)
@@ -235,7 +235,7 @@ class MainFrame(wx.Frame):
 
     def add(self, path):
         if self.bytes:
-            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
+            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
             progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
@@ -525,7 +525,7 @@ class InitDialog(wx.Dialog):
             self.error.SetLabel("設定するパスワードを入力してください")
             self.Refresh()
         elif self.password == self.ctrl2.GetValue():
-            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
+            progress = wx.ProgressDialog(TITLE, "追加中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
             progress.SetIcon(self.icon)
             progress.Show()
             progress.Pulse()
@@ -590,7 +590,7 @@ class RemoveDialog(wx.Dialog):
                 self.ctrl.SetValue(directory)
 
     def run(self, e):
-        progress = wx.ProgressDialog(TITLE, "削除中...", style=wx.PD_ELAPSED_TIME | wx.PD_ESTIMATED_TIME | wx.PD_REMAINING_TIME)
+        progress = wx.ProgressDialog(TITLE, "削除中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
         progress.SetIcon(self.icon)
         progress.Show()
         progress.Pulse()
