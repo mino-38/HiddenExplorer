@@ -417,7 +417,7 @@ class SettingFrame(wx.Frame):
 
     def save(self, e):
         for n, b in enumerate(self.boxes):
-            configmanager[n] = b
+            configmanager[n] = b.GetValue()
         configmanager.save()
         self.Close()
         
