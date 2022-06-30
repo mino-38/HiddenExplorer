@@ -361,7 +361,7 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
-            subprocess.run(["call %windir%\\notepad.exe \"{}\"".format(file)], shell=True)
+            subprocess.run("call %windir%\\notepad.exe \"{}\"".format(file), shell=True)
         else:
             if os.path.isfile(file):
                 subprocess.run("start /wait \"{}\" \"{}\"".format(os.path.basename(file), file), shell=True)
