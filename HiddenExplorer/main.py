@@ -1,4 +1,5 @@
 import atexit
+import json
 import glob
 import os
 import stat
@@ -33,6 +34,7 @@ if not os.path.isdir(root):
     os.mkdir(root)
 crypto_file = os.path.join(root, ".data")
 key_file = os.path.join(root, ".key")
+config_file = os.path.join(root, ".rc")
 if os.path.isfile(key_file):
     with open(key_file, "rb") as f:
         KEY = f.read()
@@ -41,17 +43,21 @@ else:
     with open(key_file, "wb") as f:
         f.write(KEY)
 
-def cleanup(path):
+def cleanup(path, parent):
     for p in psutil.process_iter():
         try:
             if path in {q.path for q in p.open_files()}:
                 p.kill()
         except:
             continue
-    if os.path.isfile(path):
-        os.remove(path)
-    elif os.path.isdir(path):
-        shutil.rmtree(path)
+    if configmanager[0]:
+        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp_zip, "wb") as f:
+                f.write(parent.bytes)
+            with zipfile.ZipFile(temp_zip, "a") as z:
+                for p in glob.iglob(os.path.join(path, "**"), recursive=True):
+                    pass
 
 def encrypt(file, password):
     file.seek(0)
@@ -92,6 +98,23 @@ def register_on_exit(func):
     atexit.register(func)
     signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
 
+class ConfigManager(dict):
+    configs = ["ファイル、ディレクトリの変更を保持する"]
+    def __init__(self):
+        super().__init__()
+        if os.path.isfile(config_file):
+            with open(config_file, "r") as f:
+                self.update(json.load(f))
+        else:
+            self.update({0: True})
+
+    def save(self):
+        with open(config_file, "w") as f:
+            json.dump(self, f, indent=4)
+
+    def gettext(self, num):
+        return ConfigManager.configs[num]
+
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
         self.func = func
@@ -118,13 +141,16 @@ class MainFrame(wx.Frame):
         self.password = password
         self.files = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True)}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: ConfigManager().Show()}
         self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(p, self).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
+        menu_config = wx.Menu()
+        menu_config.Append(3, "設定を開く")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
+        menu_bar.Append(menu_config, "設定")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
         self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).Scale(90, 100).ConvertToBitmap()
@@ -133,7 +159,7 @@ class MainFrame(wx.Frame):
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.app_dir = tempfile.TemporaryDirectory().name
-        register_on_exit(RunFunction(cleanup, self.app_dir))
+        register_on_exit(RunFunction(cleanup, self.app_dir, self))
         self.build()
 
     def resize_panel(self, e):
@@ -142,7 +168,7 @@ class MainFrame(wx.Frame):
             self.Refresh()
 
     def run_menu(self, e):
-        self.func[e.GetId()]()
+        self.frame_menu_func[e.GetId()]()
 
     def add_from_dialog(self, directory=False):
         if directory:
@@ -352,6 +378,34 @@ class MainFrame(wx.Frame):
                 for p in processes:
                     p.kill()
 
+class SettingFrame(wx.Frame):
+    size = (500, 300)
+    def __init__(self):
+        super().__init__(None, title=TITLE, size=SettingFrame.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
+        self.build()
+
+    def build(self):
+        self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-60))
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.panel.SetupScrolling()
+        self.boxes = []
+        for k, v in configmanager.items():
+            chbox = wx.CheckBox(self.panel, wx.ID_ANY, configmanager.gettext(k))
+            chbox.SetValue(v)
+            sizer.Add(chbox)
+            self.boxes.append(chbox)
+        button = wx.Button(self.panel, wx.ID_ANY, "変更")
+        button.Bind(wx.EVT_BUTTON, self.save)
+
+    def save(self, e):
+        for n, b in enumerate(self.boxes):
+            configmanager[n] = b
+        configmanager.save()
+        
+
 class AskPasswordFrame(wx.Frame):
     size = (250, 140)
     def __init__(self):
@@ -549,4 +603,5 @@ def main():
     app.MainLoop()
 
 if __name__ == "__main__":
+    configmanager = ConfigManager()
     main()
