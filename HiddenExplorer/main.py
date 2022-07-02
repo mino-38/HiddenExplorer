@@ -200,7 +200,8 @@ class MainFrame(wx.Frame):
 
     def resize_panel(self, e):
         if hasattr(self, "panel"):
-            self.panel.SetSize((self.Size.width-15, self.Size.height-60))
+            self.cpanel.SetSize((self.Size.width, 50))
+            self.panel.SetSize((self.Size.width-15, self.Size.height-110))
             self.Refresh()
 
     def run_menu(self, e):
@@ -224,8 +225,16 @@ class MainFrame(wx.Frame):
         if hasattr(self, "sizer"):
             self.sizer.Clear(True)
         else:
-            self.sizer = wx.BoxSizer()
-        self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-60))
+            self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.cpanel = wx.Panel(self, size=(self.Size.width, 50))
+        csizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示")
+        self.tgbutton1.SetValue(configmanager.options["verbose"])
+        self.tgbutton1.Bind(wx.EVT_TOGGLEBUTTON, self.change_toggle)
+        csizer.Add(self.tgbutton1, proportion=1)
+        self.cpanel.SetSizer(csizer)
+        self.sizer.Add(self.cpanel, proportion=1)
+        self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-110))
         self.psizer = wx.BoxSizer(wx.VERTICAL) if configmanager.options["verbose"] else wx.GridSizer(cols=4)
         if self.files:
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -248,7 +257,7 @@ class MainFrame(wx.Frame):
                 info3._text = "サイズ(B)"
                 self.listctrl.InsertColumnInfo(2, info3)
                 self.listctrl.SetColumnWidth(2, 100)
-                self.psizer.Add(self.listctrl)
+                self.psizer.Add(self.listctrl, proportion=1)
             try:
                 for n, p in enumerate(self.files, start=1):
                     if "/" not in p or (p.endswith("/") and p.count("/") == 1):
@@ -263,6 +272,16 @@ class MainFrame(wx.Frame):
         self.panel.SetupScrolling()
         self.Refresh()
         progress.Close()
+
+    def change_toggle(self, e):
+        if self.tgbutton1.GetValue():
+            self.tgbutton.SetLabel("簡易表示")
+            configmanager.options["verbose"] = True
+        else:
+            self.tgbutton.SetLabel("詳細表示")
+            configmanager.options["verbose"] = False
+        configmanager.save()
+        self.build()
 
     def add(self, path):
         if self.bytes:
