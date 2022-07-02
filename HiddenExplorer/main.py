@@ -353,7 +353,10 @@ class MainFrame(wx.Frame):
     def show_menu(self, path, directory=False):
         menu = wx.Menu()
         menu.Append(wx.MenuItem(menu, 1, "開く"))
-        menu.Append(wx.MenuItem(menu, 2, "ファイルエクスプローラーで開く" if directory else "メモ帳で開く"))
+        if directory:
+            menu.Append(wx.MenuItem(menu, 2, "ファイルエクスプローラーで開く"))
+        elif _win:
+            menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
         menu.AppendSeparator()
         menu.Append(wx.MenuItem(menu, 3, "削除"))
         menu.Bind(wx.EVT_MENU, lambda e: self.run_popupmenu(e, path))
