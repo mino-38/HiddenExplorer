@@ -24,7 +24,6 @@ from multiprocessing import Process
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 from PIL import Image
-from wx.lib.agw import ultimatelistctrl
 from wx.lib.scrolledpanel import ScrolledPanel
 
 warnings.simplefilter("ignore")
@@ -138,7 +137,7 @@ class ConfigManager(dict):
             with open(config_file, "r") as f:
                 self.update(json.load(f))
         else:
-            self.update({"0": True, "options": {"verbose": False}})
+            self.update({"0": True})
 
     def save(self):
         with open(config_file, "w") as f:
@@ -146,10 +145,6 @@ class ConfigManager(dict):
 
     def gettext(self, num):
         return ConfigManager.configs[num]
-
-    @property
-    def options(self):
-        return self["options"]
 
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
@@ -189,12 +184,8 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_config, "設定")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png"))
-        self.default_fileicon = default_fileicon.Scale(90, 100).ConvertToBitmap()
-        self.default_fileicon_mini = default_fileicon.Scale(50, 50).ConvertToBitmap()
-        default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png"))
-        self.default_diricon = default_diricon.Scale(90, 100).ConvertToBitmap()
-        self.default_diricon_mini = default_diricon.Scale(50, 50).ConvertToBitmap()
+        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
@@ -204,8 +195,7 @@ class MainFrame(wx.Frame):
 
     def resize_panel(self, e):
         if hasattr(self, "panel"):
-            self.cpanel.SetSize((self.Size.width, 50))
-            self.panel.SetSize((self.Size.width-15, self.Size.height-110))
+            self.panel.SetSize((self.Size.width-15, self.Size.height-60))
             self.Refresh()
 
     def run_menu(self, e):
@@ -230,38 +220,12 @@ class MainFrame(wx.Frame):
             self.sizer.Clear(True)
         else:
             self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.cpanel = wx.Panel(self, size=(self.Size.width, 50))
-        csizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示", size=(100, 50))
-        self.tgbutton1.SetValue(configmanager.options["verbose"])
-        self.tgbutton1.Bind(wx.EVT_TOGGLEBUTTON, self.change_toggle)
-        csizer.Add(self.tgbutton1, proportion=1)
-        self.cpanel.SetSizer(csizer)
-        self.sizer.Add(self.cpanel, proportion=1)
         self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-110))
-        self.psizer = wx.BoxSizer(wx.VERTICAL) if configmanager.options["verbose"] else wx.GridSizer(cols=4)
+        self.psizer = wx.GridSizer(cols=4)
         if self.files:
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
-            if configmanager.options["verbose"]:
-                self.listctrl = ultimatelistctrl.UltimateListCtrl(self.panel, agwStyle=wx.LC_REPORT)
-                info1 = ultimatelistctrl.UltimateListItem()
-                info1._mask = wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-                info1._text = "アイコン"
-                self.listctrl.InsertColumnInfo(0, info1)
-                self.listctrl.SetColumnWidth(0, 50)
-                info2 = ultimatelistctrl.UltimateListItem()
-                info2._mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_FORMAT
-                info2._text = "ファイル名"
-                self.listctrl.InsertColumnInfo(1, info2)
-                self.listctrl.SetColumnWidth(1, 650)
-                info3 = ultimatelistctrl.UltimateListItem()
-                info3._mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_FORMAT
-                info3._text = "サイズ(B)"
-                self.listctrl.InsertColumnInfo(2, info3)
-                self.listctrl.SetColumnWidth(2, 100)
-                self.psizer.Add(self.listctrl, proportion=1)
             try:
                 for n, p in enumerate(self.files, start=1):
                     if "/" not in p or (p.endswith("/") and p.count("/") == 1):
@@ -276,16 +240,6 @@ class MainFrame(wx.Frame):
         self.panel.SetupScrolling()
         self.Refresh()
         progress.Close()
-
-    def change_toggle(self, e):
-        if self.tgbutton1.GetValue():
-            self.tgbutton1 .SetLabel("簡易表示")
-            configmanager.options["verbose"] = True
-        else:
-            self.tgbutton1.SetLabel("詳細表示")
-            configmanager.options["verbose"] = False
-        configmanager.save()
-        self.build()
 
     def add(self, path):
         if self.bytes:
@@ -360,8 +314,8 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path, zip=None):
-        sizer = wx.BoxSizer(wx.HORIZONTAL if configmanager.options["verbose"] else wx.VERTICAL)
-        panel = wx.Panel(self.panel, size=(self.panel.Size.width, 20) if configmanager.options["verbose"] else (150, 120))
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        panel = wx.Panel(self.panel, size=(150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             if zip:
@@ -376,21 +330,15 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
                 try:
-                    img = get_icon(file).resize((50, 50) if configmanager.options["verbose"] else (90, 100))
+                    img = get_icon(file).resize((90, 100))
                     image = wx.Image(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon_mini if configmanager.options["verbose"] else self.default_fileicon if os.path.isfile(file) else self.default_diricon_mini if configmanager.options["verbose"] else self.default_diricon)
-                if configmanager.options["verbose"]:
-                    column = self.listctrl.GetColumnCount()+1
-                    self.listctrl.SetItemColumnImage(0, column, bmp)
-                    self.listctrl.SetStringItem(1, column, textwrap(path, 500))
-                    self.listctrl.SetStringItem(2, column, os.getsize(path))
-                else:
-                    bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
-                    bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
-                    sizer.Add(bmp, proportion=1)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
+                bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
+                sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
                 os.remove(temp_zip)
@@ -478,11 +426,10 @@ class SettingFrame(wx.Frame):
         self.panel.SetupScrolling()
         self.boxes = []
         for k, v in configmanager.items():
-            if k != "options":
-                chbox = wx.CheckBox(self.panel, wx.ID_ANY, configmanager.gettext(k))
-                chbox.SetValue(v)
-                sizer.Add(chbox)
-                self.boxes.append(chbox)
+            chbox = wx.CheckBox(self.panel, wx.ID_ANY, configmanager.gettext(k))
+            chbox.SetValue(v)
+            sizer.Add(chbox)
+            self.boxes.append(chbox)
         sizer.Add(wx.StaticText(self.panel))
         sizer.Add(wx.StaticText(self.panel))
         button = wx.Button(self.panel, wx.ID_ANY, "変更")
