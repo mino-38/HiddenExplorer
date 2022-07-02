@@ -5,6 +5,7 @@ import os
 import stat
 import sys
 import subprocess
+import platform
 import time
 import threading
 import shutil
@@ -27,6 +28,7 @@ from wx.lib.scrolledpanel import ScrolledPanel
 
 warnings.simplefilter("ignore")
 
+_win = platform.system() == "Windows"
 
 TITLE = "HiddenExplorer"
 FILL = b"\r"
@@ -46,6 +48,12 @@ else:
     KEY = get_random_bytes(AES.block_size*2)
     with open(key_file, "wb") as f:
         f.write(KEY)
+
+def make_cmd(path, notepad=False):
+    if _win:
+        return "start " + "%windir%\\notepad.exe " if notepad else '"{}" '.format(os.path.basename(path)) + path
+    else:
+        return 'xdg-open "{}"'.format(path)
 
 def cleanup(path, parent):
     app = wx.App()
@@ -375,10 +383,10 @@ class MainFrame(wx.Frame):
         finally:
             os.remove(temp_zip)
         if notepad and os.path.isfile(file):
-            subprocess.run("start %windir%\\notepad.exe \"{}\"".format(file), shell=True)
+            subprocess.run(make_cmd('"{}"'.format(file), notepad=True), shell=True)
         else:
             if os.path.isfile(file):
-                subprocess.run("start \"{}\" \"{}\"".format(os.path.basename(file), file), shell=True)
+                subprocess.run(make_cmd('"{}"'.format(file)), shell=True)
             else:
                 processes = []
                 def open_dir(directory):
@@ -389,7 +397,7 @@ class MainFrame(wx.Frame):
                             if os.path.isdir(path):
                                 return open_dir(path)
                             else:
-                                p = Process(target=subprocess.run, args=("start \"{}\" \"{}\"".format(os.path.basename(path), path),), kwargs={"shell": True})
+                                p = Process(target=subprocess.run, args=(make_cmd('"{}"'.format(path)),), kwargs={"shell": True})
                                 p.start()
                                 processes.append(p)
                                 return True
