@@ -356,7 +356,6 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path, zip=None):
-        if not configmanager["verbose"]:
         sizer = wx.BoxSizer(wx.HORIZONTAL if configmanager.options["verbose"] else wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(self.panel.Size.width, 20) if configmanager.options["verbose"] else (150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
