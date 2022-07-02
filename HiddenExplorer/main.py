@@ -189,8 +189,12 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_config, "設定")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png"))
-        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png"))
+        default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png"))
+        self.default_fileicon = default_fileicon.Scale((90, 100)).ConvertToBitmap()
+        self.default_fileicon_mini = default_fileicon.Scale((50, 50)).ConvertToBitmap()
+        default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png"))
+        self.default_diricon = default_diricon.Scale((90, 100)).ConvertToBitmap()
+        self.default_diricon_mini = default_diricon.Scale((50, 50)).ConvertToBitmap()
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
@@ -275,10 +279,10 @@ class MainFrame(wx.Frame):
 
     def change_toggle(self, e):
         if self.tgbutton1.GetValue():
-            self.tgbutton.SetLabel("簡易表示")
+            self.tgbutton1 .SetLabel("簡易表示")
             configmanager.options["verbose"] = True
         else:
-            self.tgbutton.SetLabel("詳細表示")
+            self.tgbutton1.SetLabel("詳細表示")
             configmanager.options["verbose"] = False
         configmanager.save()
         self.build()
@@ -377,7 +381,7 @@ class MainFrame(wx.Frame):
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((50, 50) if configmanager.options["verbose"] else (90, 100)).ConvertToBitmap() if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)).ConvertToBitmap())
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon_mini if configmanager.options["verbose"] else self.default_fileicon if os.path.isfile(file) else self.default_diricon_mini if configmanager.options["verbose"] self.default_diricon)
                 if configmanager.options["verbose"]:
                     column = self.GetColumnCount()+1
                     self.listctrl.SetItemColumnImage(0, column, bmp)
