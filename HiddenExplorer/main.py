@@ -245,7 +245,7 @@ class MainFrame(wx.Frame):
                 self.listctrl.SetColumnWidth(1, 650)
                 info3 = ultimatelistctrl.UltimateListItem()
                 info3._mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_FORMAT
-                info3._text = "サイズ"
+                info3._text = "サイズ(B)"
                 self.listctrl.InsertColumnInfo(2, info3)
                 self.listctrl.SetColumnWidth(2, 100)
                 self.psizer.Add(self.listctrl)
@@ -361,7 +361,10 @@ class MainFrame(wx.Frame):
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((50, 50) if configmanager.options["verbose"] else (90, 100)) if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)))
                 if configmanager.options["verbose"]:
-                    self.listbox.SetItemColumnImage(0, bmp)
+                    column = self.GetColumnCount()+1
+                    self.listctrl.SetItemColumnImage(0, column, bmp)
+                    self.listctrl.SetStringItem(1, column, textwrap(path, 500))
+                    self.listctrl.SetStringItem(2, column, os.getsize(path))
                 else:
                     bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                     bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
