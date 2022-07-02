@@ -232,7 +232,7 @@ class MainFrame(wx.Frame):
             self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.cpanel = wx.Panel(self, size=(self.Size.width, 50))
         csizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示", size=(30, 50))
+        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示", size=(100, 50))
         self.tgbutton1.SetValue(configmanager.options["verbose"])
         self.tgbutton1.Bind(wx.EVT_TOGGLEBUTTON, self.change_toggle)
         csizer.Add(self.tgbutton1, proportion=1)
@@ -245,7 +245,7 @@ class MainFrame(wx.Frame):
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
             if configmanager.options["verbose"]:
-                self.listctrl = ultimatelistctrl.UltimateListCtrl(self.panel, size=self.panel.Size)
+                self.listctrl = ultimatelistctrl.UltimateListCtrl(self.panel, agwStyle=wx.LC_REPORT)
                 info1 = ultimatelistctrl.UltimateListItem()
                 info1._mask = wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
                 info1._text = "アイコン"
@@ -383,7 +383,7 @@ class MainFrame(wx.Frame):
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon_mini if configmanager.options["verbose"] else self.default_fileicon if os.path.isfile(file) else self.default_diricon_mini if configmanager.options["verbose"] else self.default_diricon)
                 if configmanager.options["verbose"]:
-                    column = self.GetColumnCount()+1
+                    column = self.listctrl.GetColumnCount()+1
                     self.listctrl.SetItemColumnImage(0, column, bmp)
                     self.listctrl.SetStringItem(1, column, textwrap(path, 500))
                     self.listctrl.SetStringItem(2, column, os.getsize(path))
