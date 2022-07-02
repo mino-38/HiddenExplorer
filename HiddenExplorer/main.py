@@ -228,7 +228,7 @@ class MainFrame(wx.Frame):
             self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.cpanel = wx.Panel(self, size=(self.Size.width, 50))
         csizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示")
+        self.tgbutton1 = wx.ToggleButton(self.cpanel, wx.ID_ANY, "簡易表示" if configmanager.options["verbose"] else "詳細表示", size=(30, 50))
         self.tgbutton1.SetValue(configmanager.options["verbose"])
         self.tgbutton1.Bind(wx.EVT_TOGGLEBUTTON, self.change_toggle)
         csizer.Add(self.tgbutton1, proportion=1)
