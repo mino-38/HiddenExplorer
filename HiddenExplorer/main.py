@@ -381,7 +381,7 @@ class MainFrame(wx.Frame):
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon_mini if configmanager.options["verbose"] else self.default_fileicon if os.path.isfile(file) else self.default_diricon_mini if configmanager.options["verbose"] self.default_diricon)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon_mini if configmanager.options["verbose"] else self.default_fileicon if os.path.isfile(file) else self.default_diricon_mini if configmanager.options["verbose"] else self.default_diricon)
                 if configmanager.options["verbose"]:
                     column = self.GetColumnCount()+1
                     self.listctrl.SetItemColumnImage(0, column, bmp)
