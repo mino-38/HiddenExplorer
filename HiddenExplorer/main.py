@@ -24,6 +24,7 @@ from multiprocessing import Process
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
 from PIL import Image
+from wx.lib.agw import ultimatelistctrl
 from wx.lib.scrolledpanel import ScrolledPanel
 
 warnings.simplefilter("ignore")
@@ -230,6 +231,24 @@ class MainFrame(wx.Frame):
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             with open(temp_zip, "wb") as f:
                 f.write(self.bytes)
+            if configmanager.options["verbose"]:
+                self.listctrl = ultimatelistctrl.UltimateListCtrl(self.panel, size=self.panel.Size)
+                info1 = ultimatelistctrl.UltimateListItem()
+                info1._mask = wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+                info1._text = "アイコン"
+                self.listctrl.InsertColumnInfo(0, info1)
+                self.listctrl.SetColumnWidth(0, 50)
+                info2 = ultimatelistctrl.UltimateListItem()
+                info2._mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_FORMAT
+                info2._text = "ファイル名"
+                self.listctrl.InsertColumnInfo(1, info2)
+                self.listctrl.SetColumnWidth(1, 650)
+                info3 = ultimatelistctrl.UltimateListItem()
+                info3._mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_FORMAT
+                info3._text = "サイズ"
+                self.listctrl.InsertColumnInfo(2, info3)
+                self.listctrl.SetColumnWidth(2, 100)
+                self.psizer.Add(self.listctrl)
             try:
                 for n, p in enumerate(self.files, start=1):
                     if "/" not in p or (p.endswith("/") and p.count("/") == 1):
@@ -318,6 +337,7 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path, zip=None):
+        if not configmanager["verbose"]:
         sizer = wx.BoxSizer(wx.HORIZONTAL if configmanager.options["verbose"] else wx.VERTICAL)
         panel = wx.Panel(self.panel, size=(self.panel.Size.width, 20) if configmanager.options["verbose"] else (150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -334,17 +354,18 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
                 try:
-                    img = get_icon(file).resize((10, 10) if configmanager.options["verbose"] else (90, 100))
+                    img = get_icon(file).resize((50, 50) if configmanager.options["verbose"] else (90, 100))
                     image = wx.Image(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)) if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)))
-                bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
-                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
-                sizer.Add(bmp, proportion=1)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((50, 50) if configmanager.options["verbose"] else (90, 100)) if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)))
                 if configmanager.options["verbose"]:
-                    pass
+                    self.listbox.SetItemColumnImage(0, bmp)
+                else:
+                    bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+                    bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
+                    sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
                 os.remove(temp_zip)
