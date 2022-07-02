@@ -189,8 +189,8 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_config, "設定")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).ConvertToBitmap()
-        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).ConvertToBitmap()
+        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png"))
+        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png"))
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
@@ -377,7 +377,7 @@ class MainFrame(wx.Frame):
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((50, 50) if configmanager.options["verbose"] else (90, 100)) if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)))
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((50, 50) if configmanager.options["verbose"] else (90, 100)).ConvertToBitmap() if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)).ConvertToBitmap())
                 if configmanager.options["verbose"]:
                     column = self.GetColumnCount()+1
                     self.listctrl.SetItemColumnImage(0, column, bmp)
