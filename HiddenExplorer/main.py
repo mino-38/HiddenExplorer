@@ -130,14 +130,14 @@ def register_on_exit(func):
     signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
 
 class ConfigManager(dict):
-    configs = {"0": "ファイル、ディレクトリの変更を保持する"}
+    configs = {"0": "ファイル、ディレクトリの変更を保持する", "options": ""}
     def __init__(self):
         super().__init__()
         if os.path.isfile(config_file):
             with open(config_file, "r") as f:
                 self.update(json.load(f))
         else:
-            self.update({"0": True})
+            self.update({"0": True, "options": {"verbose": False}})
 
     def save(self):
         with open(config_file, "w") as f:
@@ -145,6 +145,10 @@ class ConfigManager(dict):
 
     def gettext(self, num):
         return ConfigManager.configs[num]
+
+    @property
+    def options(self):
+        return self["options"]
 
 class RunFunction:
     def __init__(self, func, *args, **kwargs):
@@ -184,8 +188,8 @@ class MainFrame(wx.Frame):
         menu_bar.Append(menu_config, "設定")
         self.SetMenuBar(menu_bar)
         self.Bind(wx.EVT_MENU, self.run_menu)
-        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).Scale(90, 100).ConvertToBitmap()
-        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).Scale(90, 100).ConvertToBitmap()
+        self.default_fileicon = wx.Image(os.path.join(RESOURCE, "default_icon.png")).ConvertToBitmap()
+        self.default_diricon = wx.Image(os.path.join(RESOURCE, "directory_icon.png")).ConvertToBitmap()
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
@@ -221,7 +225,7 @@ class MainFrame(wx.Frame):
         else:
             self.sizer = wx.BoxSizer()
         self.panel = ScrolledPanel(self, size=(self.Size.width-15, self.Size.height-60))
-        self.psizer = wx.GridSizer(cols=4)
+        self.psizer = wx.BoxSizer(wx.VERTICAL) if configmanager.options["verbose"] else wx.GridSizer(cols=4)
         if self.files:
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             with open(temp_zip, "wb") as f:
@@ -314,8 +318,8 @@ class MainFrame(wx.Frame):
             os.remove(temp_zip)
 
     def set_layout(self, path, zip=None):
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        panel = wx.Panel(self.panel, size=(150, 120))
+        sizer = wx.BoxSizer(wx.HORIZONTAL if configmanager.options["verbose"] else wx.VERTICAL)
+        panel = wx.Panel(self.panel, size=(self.panel.Size.width, 20) if configmanager.options["verbose"] else (150, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             if zip:
@@ -330,15 +334,17 @@ class MainFrame(wx.Frame):
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
                 try:
-                    img = get_icon(file).resize((90, 100))
+                    img = get_icon(file).resize((10, 10) if configmanager.options["verbose"] else (90, 100))
                     image = wx.Image(img.size[0], img.size[1])
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)) if os.path.isfile(file) else self.default_diricon.Scale((10, 10) if configmanager.options["verbose"] else (90, 100)))
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, os.path.isdir(file)))
                 sizer.Add(bmp, proportion=1)
+                if configmanager.options["verbose"]:
+                    pass
         finally:
             if not zip:
                 os.remove(temp_zip)
@@ -426,10 +432,11 @@ class SettingFrame(wx.Frame):
         self.panel.SetupScrolling()
         self.boxes = []
         for k, v in configmanager.items():
-            chbox = wx.CheckBox(self.panel, wx.ID_ANY, configmanager.gettext(k))
-            chbox.SetValue(v)
-            sizer.Add(chbox)
-            self.boxes.append(chbox)
+            if k != "options":
+                chbox = wx.CheckBox(self.panel, wx.ID_ANY, configmanager.gettext(k))
+                chbox.SetValue(v)
+                sizer.Add(chbox)
+                self.boxes.append(chbox)
         sizer.Add(wx.StaticText(self.panel))
         sizer.Add(wx.StaticText(self.panel))
         button = wx.Button(self.panel, wx.ID_ANY, "変更")
