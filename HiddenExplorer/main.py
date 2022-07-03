@@ -67,8 +67,10 @@ def cleanup(path, parent):
     for n, p in enumerate(processes, start=1):
         try:
             for q in p.open_files():
-                if q.path.startswith(path):
+                if ".." not in os.path.relpath(q, path):
                     p.kill()
+            if ".." not in os.path.relpath(p.exe(), path):
+                p.kill()
         except:
             continue
         progress.Update(round(n / length * 100))
