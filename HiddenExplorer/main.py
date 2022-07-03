@@ -147,7 +147,7 @@ class ConfigManager(dict):
         return ConfigManager.configs[num]
 
 class RunFunction:
-    def __init__(self, func, *args, _at_exit=lambda: pass, **kwargs):
+    def __init__(self, func, *args, _at_exit=lambda: "", **kwargs):
         self.func = func
         self.args = args
         self.atexit = _at_exit
