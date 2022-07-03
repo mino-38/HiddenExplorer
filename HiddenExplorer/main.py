@@ -347,7 +347,7 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
                 bmp.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
-                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir, _at_exit=RunFunction(self.paint_selected_color, panel)))
+                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
                 bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.paint_on_monse_color, panel, "#CCFFFF"))
                 bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.paint_on_monse_color, panel, wx.NullColour))
                 sizer.Add(bmp, flag=wx.ALIGN_CENTER, proportion=1)
