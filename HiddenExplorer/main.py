@@ -294,9 +294,6 @@ class MainFrame(wx.Frame):
             init.ShowModal()
             if hasattr(init, "password"):
                 self.sizer.Clear(True)
-                self.panel = ScrolledPanel(self, size=self.Size)
-                self.panel.SetupScrolling()
-                self.psizer = wx.GridSizer(cols=4)
                 self.password = init.password
                 self.bytes = decrypt(self.password)
                 self.files = files
