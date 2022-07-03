@@ -237,6 +237,7 @@ class MainFrame(wx.Frame):
             finally:
                 os.remove(temp_zip)
         self.panel.SetSizer(self.psizer)
+        self.panel.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
         self.sizer.Add(self.panel, proportion=1)
         self.SetSizer(self.sizer)
         self.Layout()
