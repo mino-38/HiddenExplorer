@@ -293,7 +293,6 @@ class MainFrame(wx.Frame):
             init = InitDialog(self, self.set_layout, files)
             init.ShowModal()
             if hasattr(init, "password"):
-                self.sizer.Clear(True)
                 self.password = init.password
                 self.bytes = decrypt(self.password)
                 self.files = files
