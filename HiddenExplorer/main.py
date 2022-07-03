@@ -298,8 +298,6 @@ class MainFrame(wx.Frame):
                 self.files = files
                 for p in files:
                     self.set_layout(os.path.basename(p))
-                self.panel.SetSizer(self.psizer)
-                self.sizer.Add(self.panel, proportion=1)
         self.update_files()
         self.Layout()
         self.Refresh()
