@@ -51,7 +51,8 @@ else:
 
 def make_cmd(path, notepad=False):
     if _win:
-        return 'start {} {}'.format("%windir%\\notepad.exe" if notepad else '"{}"'.format(os.path.basename(path)), path)
+        path = path.strip('"')
+        return 'start {} "{}"'.format("%windir%\\notepad.exe" if notepad else '"{}"'.format(os.path.basename(path)), path)
     else:
         return 'open "{}"'.format(path)
 
