@@ -372,7 +372,7 @@ class MainFrame(wx.Frame):
 
     def paint_selected_color(self, widget):
         self.release_selected()
-        widget.SetBackgroundColour("#66FFFF")
+        widget.SetBackgroundColour("#8EB8FF")
         self.selected_widget = widget
         self.Refresh()
 
