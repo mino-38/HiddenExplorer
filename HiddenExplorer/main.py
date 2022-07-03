@@ -147,13 +147,15 @@ class ConfigManager(dict):
         return ConfigManager.configs[num]
 
 class RunFunction:
-    def __init__(self, func, *args, **kwargs):
+    def __init__(self, func, *args, _at_exit, **kwargs):
         self.func = func
         self.args = args
+        self.atexit = _at_exit
         self.kwargs = kwargs
 
     def __call__(self, *_, **__):
         self.func(*self.args, **self.kwargs)
+        self.atexit()
 
 class FileDropTarget(wx.FileDropTarget):
     def __init__(self, func):
@@ -339,8 +341,8 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
-                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(panel.SetBackgroundColour, "#99FFFF"))
-                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(panel.SetBackgroundColour, wx.NullColour))
+                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(panel.SetBackgroundColour, "#99FFFF", _at_exit=self.Refresh))
+                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(panel.SetBackgroundColour, wx.NullColour, _at_exit=self.Refresh))
                 sizer.Add(bmp, flag=wx.ALIGN_CENTER, proportion=1)
         finally:
             if not zip:
