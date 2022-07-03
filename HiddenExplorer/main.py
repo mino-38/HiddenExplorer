@@ -347,7 +347,7 @@ class MainFrame(wx.Frame):
         transpanel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
         transpanel.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.set_trans_color, transpanel, "#444444"))
         transpanel.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.set_trans_color, transpanel, wx.NullColour))
-        transpanel.SetTransparent(int)
+        transpanel.SetTransparent(0)
         sizer.Add(transpanel)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
@@ -357,7 +357,7 @@ class MainFrame(wx.Frame):
     def set_trans_color(self, panel, color):
         panel.SetBackgroundColour(color)
         if color == wx.NullColour:
-            panel.SetTransparent(int)
+            panel.SetTransparent(0)
         else:
             panel.SetTransparent(200)
 
