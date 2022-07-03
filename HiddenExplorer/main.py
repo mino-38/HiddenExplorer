@@ -339,8 +339,8 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
-                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.set_backgroundcolor, panel, "#444444"))
-                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.set_backgroundcolor, panel, wx.NullColour))
+                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.set_bmpmask, bmp, "#444444"))
+                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.set_bmpmask, bmp, wx.NullColour))
                 sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
@@ -351,8 +351,10 @@ class MainFrame(wx.Frame):
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
 
-    def set_backgroundcolor(self, widget, color):
-        widget.SetBackgroundColour(color)
+    def set_bmpmask(self, bmp, color):
+        bitmap = bmp.GetBitmap()
+        bitmap.SetMaskColour(color)
+        bmp.SetBitmap(bitmap)
         self.Refresh()
 
     def show_menu(self, path, directory=False):
@@ -483,8 +485,10 @@ class AskPasswordFrame(wx.Frame):
             return
         self.running = True
         self.button.Disable()
-        self.Refresh()
-        self.Update()
+        progress = wx.ProgressDialog(TITLE, "復号化中...")
+        progress.SetIcon(self.icon)
+        progress.Show()
+        progress.Pulse()
         password = self.ctrl.GetValue()
         bytes_ = decrypt(password)
         temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
@@ -492,6 +496,7 @@ class AskPasswordFrame(wx.Frame):
             with open(temp, "wb") as f:
                 f.write(bytes_)
                 f.flush()
+            progress.Close()
             if zipfile.is_zipfile(temp):
                 MainFrame(bytes_, password).Show()
                 self.Close()
