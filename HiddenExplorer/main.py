@@ -344,8 +344,8 @@ class MainFrame(wx.Frame):
                 bmp.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir, _at_exit=RunFunction(self.paint_selected_color, panel)))
-                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.paint_on_monse_color, panel))
-                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.paint_on_monse_color, panel))
+                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.paint_on_monse_color, panel, "#CCFFFF"))
+                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.paint_on_monse_color, panel, wx.NullColour))
                 sizer.Add(bmp, flag=wx.ALIGN_CENTER, proportion=1)
         finally:
             if not zip:
@@ -357,9 +357,9 @@ class MainFrame(wx.Frame):
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
 
-    def paint_on_monse_color(self, widget):
+    def paint_on_monse_color(self, widget, color):
         if widget != self.selected_widget:
-            widget.SetBackgroundColour("CCFFFF")
+            widget.SetBackgroundColour(color)
             self.Refresh()
 
     def release_selected(self):
