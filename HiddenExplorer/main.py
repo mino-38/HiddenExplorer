@@ -336,30 +336,20 @@ class MainFrame(wx.Frame):
                     image.SetData(img.convert("RGB").tobytes())
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
-                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_fileicon if os.path.isfile(file) else self.default_diricon)
+                    bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
+                bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
+                bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
+                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(panel.SetBackgroundColour, "#444444"))
+                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(panel.SetBackgroundColour, wx.NullColour))
                 sizer.Add(bmp, proportion=1)
         finally:
             if not zip:
                 os.remove(temp_zip)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), proportion=1)
-        transpanel = wx.Panel(panel, size=panel.Size)
-        transpanel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
-        transpanel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
-        transpanel.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.set_trans_color, transpanel, "#444444"))
-        transpanel.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.set_trans_color, transpanel, wx.NullColour))
-        transpanel.SetTransparent(0)
-        sizer.Add(transpanel)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
-
-    def set_trans_color(self, panel, color):
-        panel.SetBackgroundColour(color)
-        if color == wx.NullColour:
-            panel.SetTransparent(0)
-        else:
-            panel.SetTransparent(200)
 
     def show_menu(self, path, directory=False):
         menu = wx.Menu()
