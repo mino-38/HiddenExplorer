@@ -315,7 +315,7 @@ class MainFrame(wx.Frame):
 
     def set_layout(self, path, zip=None):
         sizer = wx.BoxSizer(wx.VERTICAL)
-        panel = wx.Panel(self.panel, size=(150, 120))
+        panel = wx.Panel(self.panel, size=(120, 120))
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             if zip:
@@ -339,23 +339,17 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
-                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.set_bmpmask, bmp, "#444444"))
-                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.set_bmpmask, bmp, wx.NullColour))
-                sizer.Add(bmp, proportion=1)
+                bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(panel.SetBackgroundColour, "#99FFFF"))
+                bmp.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(panel.SetBackgroundColour, wx.NullColour))
+                sizer.Add(bmp, flag=wx.ALIGN_CENTER, proportion=1)
         finally:
             if not zip:
                 os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), proportion=1)
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER, proportion=1)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
-
-    def set_bmpmask(self, bmp, color):
-        bitmap = bmp.GetBitmap()
-        bitmap.SetMaskColour(color)
-        bmp.SetBitmap(bitmap)
-        self.Refresh()
 
     def show_menu(self, path, directory=False):
         menu = wx.Menu()
