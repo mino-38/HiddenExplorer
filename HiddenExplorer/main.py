@@ -341,7 +341,7 @@ class MainFrame(wx.Frame):
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, image.ConvertToBitmap())
                 except:
                     bmp = wx.StaticBitmap(panel, wx.ID_ANY, self.default_diricon if isdir else self.default_fileicon)
-                bmp.Bind(wx.EVT_LEFT_CLICK, lambda _: self.release_selected())
+                bmp.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
                 bmp.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
                 bmp.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir, _at_exit=RunFunction(self.paint_selected_color, panel)))
                 bmp.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.paint_on_monse_color, panel))
@@ -352,7 +352,7 @@ class MainFrame(wx.Frame):
                 os.remove(temp_zip)
         sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER, proportion=1)
         panel.SetSizer(sizer)
-        panel.Bind(wx.EVT_LEFT_CLICK, lambda _: self.release_selected())
+        panel.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path))
         panel.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path))
         self.psizer.Add(panel, proportion=1)
