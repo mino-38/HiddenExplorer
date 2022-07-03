@@ -329,7 +329,7 @@ class MainFrame(wx.Frame):
                         file = z.extract(path, os.path.join(d, os.path.splitext(path)[1]))
                     except:
                         file = z.extract(path+"/", os.path.join(d, path))
-                isdir = os.path.isdir(isdir)
+                isdir = os.path.isdir(file)
                 try:
                     img = get_icon(file).resize((90, 100))
                     image = wx.Image(img.size[0], img.size[1])
