@@ -606,7 +606,7 @@ class RemoveDialog(wx.Dialog):
         sizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.ctrl = wx.TextCtrl(self.panel, size=(250, 20))
         sizer2.Add(self.ctrl)
-        self.button1 = wx.Button(self.panel, wx.ID_ANY, "参照")
+        self.button1 = wx.Button(self.panel, wx.ID_ANY, "参照", size=(wx.DefaultSize.width, 20))
         self.button1.Bind(wx.EVT_BUTTON, self.set_from_dialog)
         sizer2.Add(self.button1)
         sizer.Add(sizer2, flag=wx.ALIGN_CENTER)
