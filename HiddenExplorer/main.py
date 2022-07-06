@@ -348,7 +348,13 @@ class MainFrame(wx.Frame):
         finally:
             if not zip:
                 os.remove(temp_zip)
-        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER, proportion=1)
+        text = wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15))
+        text.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
+        text.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
+        text.Bind(wx.EVT_RIGHT_UP, RunFunction(self.show_menu, path, isdir))
+        text.Bind(wx.EVT_ENTER_WINDOW, RunFunction(self.paint_on_monse_color, panel, "#CCFFFF"))
+        text.Bind(wx.EVT_LEAVE_WINDOW, RunFunction(self.paint_on_monse_color, panel, wx.NullColour))
+        sizer.Add(text, flag=wx.ALIGN_CENTER, proportion=1)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
