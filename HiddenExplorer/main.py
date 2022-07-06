@@ -348,7 +348,7 @@ class MainFrame(wx.Frame):
         finally:
             if not zip:
                 os.remove(temp_zip)
-        sizer.Add(wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER, proportion=1)
+        sizer.Add(wx.StaticText(panel, wx.ID_ANY, textwrap(path, 15)), flag=wx.ALIGN_CENTER, proportion=1)
         panel.SetSizer(sizer)
         panel.Bind(wx.EVT_LEFT_DOWN, lambda _: self.release_selected())
         panel.Bind(wx.EVT_LEFT_DCLICK, RunFunction(self.run_file, path, _at_exit=RunFunction(self.paint_selected_color, panel)))
