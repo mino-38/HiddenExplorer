@@ -88,9 +88,9 @@ def cleanup(path, parent):
                     if os.path.isdir(to):
                         shutil.rmtree(to)
                     shutil.move(p, to)
-            shutil.make_archive(temp_zip, format="zip", root_dir=d)
-            with open(temp_zip+".zip", "rb") as f:
-                encrypt(f, parent.password)
+                shutil.make_archive(temp_zip, format="zip", root_dir=d)
+                with open(temp_zip+".zip", "rb") as f:
+                    encrypt(f, parent.password)
         finally:
             os.remove(temp_zip)
     progress.Update(100)
