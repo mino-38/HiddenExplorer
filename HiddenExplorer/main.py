@@ -80,7 +80,8 @@ def cleanup(path, parent):
             with open(temp_zip, "wb") as f:
                 f.write(parent.bytes)
             with tempfile.TemporaryDirectory() as d:
-                shutil.unpack_archive(temp_zip, d)
+                with zipfile.ZipFile(temp_zip, "r") as z:
+                    z.extractall(d)
                 os.remove(temp_zip)
                 for p in glob.iglob(os.path.join(path, "*")):
                     to = os.path.join(d, os.path.basename(p.rstrip(os.sep)))
