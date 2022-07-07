@@ -79,10 +79,16 @@ def cleanup(path, parent):
         try:
             with open(temp_zip, "wb") as f:
                 f.write(parent.bytes)
-            with zipfile.ZipFile(temp_zip, "a") as z:
-                for p in glob.glob(os.path.join(path, "**"), recursive=True)[1:]:
-                    z.write(p, os.path.relpath(p, path))
-            with open(temp_zip, "rb") as f:
+            with tempfile.TemporaryDirectory() as d:
+                shutil.unpack_archive(temp_zip, d)
+                os.remove(temp_zip)
+                for p in glob.iglob(os.path.join(path, "*")):
+                    to = os.path.join(d, os.path.basename(p.rstrip(os.sep)))
+                    if os.path.isdir(to):
+                        shutil.rmtree(to)
+                    shutil.move(p, to)
+            shutil.make_archive(temp_zip, format="zip", root_dir=d)
+            with open(temp_zip+".zip", "rb") as f:
                 encrypt(f, parent.password)
         finally:
             os.remove(temp_zip)
