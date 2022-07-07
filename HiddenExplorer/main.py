@@ -393,20 +393,22 @@ class MainFrame(wx.Frame):
     def _run_file(self, path, notepad):
         if not os.path.splitext(path)[1]:
             notepad = True
-        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
-        try:
-            with open(temp_zip, "wb") as f:
-                f.write(self.bytes)
-            with zipfile.ZipFile(temp_zip, "r") as z:
-                try:
-                    file = z.extract(path, self.app_dir)
-                except:
-                    file = z.extract(path+"/", self.app_dir)
-                if os.path.isdir(file):
-                    for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
-                        z.extract(p, self.app_dir)
-        finally:
-            os.remove(temp_zip)
+        file = os.path.join(self.app_dir, os.path.basename(path.rstrip("/")))
+        if not os.path.exists(file):
+            temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+            try:
+                with open(temp_zip, "wb") as f:
+                    f.write(self.bytes)
+                with zipfile.ZipFile(temp_zip, "r") as z:
+                    try:
+                        file = z.extract(path, self.app_dir)
+                    except:
+                        file = z.extract(path+"/", self.app_dir)
+                    if os.path.isdir(file):
+                        for p in [t for t in z.namelist() if t.startswith(os.path.basename(file))]:
+                            z.extract(p, self.app_dir)
+            finally:
+                os.remove(temp_zip)
         if notepad and os.path.isfile(file):
             subprocess.run(make_cmd('"{}"'.format(file), notepad=True), shell=True)
         else:
