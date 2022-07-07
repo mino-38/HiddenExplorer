@@ -368,7 +368,7 @@ class MainFrame(wx.Frame):
             self.Refresh()
 
     def release_selected(self):
-        if self.selected_widget is not None:
+        if self.selected_widget:
             self.selected_widget.SetBackgroundColour(wx.NullColour)
             self.selected_widget = None
             self.Refresh()
