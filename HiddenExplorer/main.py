@@ -90,6 +90,7 @@ def cleanup(path, parent):
                 shutil.make_archive(temp_zip, format="zip", root_dir=d)
                 with open(temp_zip+".zip", "rb") as f:
                     encrypt(f, parent.password)
+                os.remove(temp_zip+".zip")
         finally:
             os.remove(temp_zip)
     progress.Update(100)
@@ -662,6 +663,7 @@ class RemoveDialog(wx.Dialog):
                     encrypt(f, self.password)
                     f.seek(0)
                     self.parent.bytes = f.read()
+                os.remove(temp_zip+".zip")
         finally:
             progress.Close()
         self.draw()
