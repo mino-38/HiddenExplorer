@@ -82,7 +82,6 @@ def cleanup(path, parent):
             with tempfile.TemporaryDirectory() as d:
                 with zipfile.ZipFile(temp_zip, "r") as z:
                     z.extractall(d)
-                os.remove(temp_zip)
                 for p in glob.iglob(os.path.join(path, "*")):
                     to = os.path.join(d, os.path.basename(p.rstrip(os.sep)))
                     if os.path.isdir(to):
