@@ -532,6 +532,59 @@ class AskPasswordFrame(wx.Frame):
         finally:
             os.remove(temp)
 
+class ResetPasswordDialog(wx.Dialog):
+    size = (320, 200)
+    def __init__(self, parent):
+        super().__init__(parent, title=TITLE, size=ResetPasswordDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
+        self.build()
+
+    def build(self):
+        self.sizer = wx.BoxSizer()
+        self.panel = wx.Panel(self, size=self.Size)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "現在のパスワード"))
+        self.ctrl1 = wx.TextCtrl(self.panel, size=(400, 20), style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
+        sizer.Add(self.ctrl1)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "新しいパスワード"))
+        self.ctrl2 = wx.TextCtrl(self.panel, size=(400, 20), style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
+        sizer.Add(self.ctrl2)
+        sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "確認"))
+        self.ctrl3 = wx.TextCtrl(self.panel, size=(400, 20), style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
+        sizer.Add(self.ctrl3)
+        self.button = wx.Button(self.panel, wx.ID_ANY, "設定")
+        self.button.Bind(wx.EVT_BUTTON, self.run)
+        sizer.Add(self.button)
+        self.error = wx.StaticText(self.panel)
+        self.error.SetForegroundColour("#FF0000")
+        sizer.Add(self.error)
+        self.ctrl1.Bind(wx.EVT_TEXT_ENTER, RunFunction(self.ctrl2.SetFocus))
+        self.ctrl2.Bind(wx.EVT_TEXT_ENTER, RunFunction(self.ctrl3.SetFocus))
+        self.ctrl3.Bind(wx.EVT_TEXT_ENTER, self.run)
+
+    def run(self, e):
+        bytes_ = decrypt(self.ctrl1.GetValue())
+        temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+        try:
+            with open(temp, "wb") as f:
+                f.write(bytes_)
+                f.flush()
+            if zipfile.is_zipfile(temp):
+                new_password = self.ctrl2.GetValue()
+                if new_password == self.ctrl3.GetValue():
+                    with open(temp, "rb") as f:
+                        encrypt(f, new_password)
+                    self.Close()
+                else:
+                    self.error.SetLabel("新しいパスワードが確認用と一致していません")
+                    self.Refresh()
+            else:
+                self.error.SetLabel("現在のパスワードが違います")
+                self.Refresh()
+        finally:
+            os.remove(temp)
+
 class InitDialog(wx.Dialog):
     size = (320, 200)
     def __init__(self, parent, func, files):
