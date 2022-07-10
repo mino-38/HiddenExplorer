@@ -34,13 +34,13 @@ TITLE = "HiddenExplorer"
 FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
 RESOURCE = os.path.join(os.path.dirname(__file__), "resources")
+ROOT = os.path.join(os.getenv("APPDATA"), "Local", ".HiddenExplorer") if _win else os.getenv("HOME")
 
-root = os.path.join(os.getenv("APPDATA"), "Local", ".HiddenExplorer") if _win else os.getenv("HOME")
-if not os.path.isdir(root):
+if not os.path.isdir(ROOT):
     os.mkdir(root)
-crypto_file = os.path.join(root, ".data")
-key_file = os.path.join(root, ".key")
-config_file = os.path.join(root, ".rc")
+crypto_file = os.path.join(ROOT, ".data")
+key_file = os.path.join(ROOT, ".key")
+config_file = os.path.join(ROOT, ".rc")
 if os.path.isfile(key_file):
     with open(key_file, "rb") as f:
         KEY = f.read()
@@ -57,7 +57,8 @@ def make_cmd(path, notepad=False):
         return 'open "{}"'.format(path)
 
 def cleanup(path, parent):
-    app = wx.App()
+    if not wx.GetApp():
+        app = wx.App()
     progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
     progress.Pulse()
     progress.Show()
@@ -74,7 +75,7 @@ def cleanup(path, parent):
         except:
             continue
         progress.Update(round(n / length * 100))
-    if configmanager["0"]:
+    if configmanager["0"] and path != ROOT:
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             with open(temp_zip, "wb") as f:
@@ -99,6 +100,13 @@ def cleanup(path, parent):
     elif os.path.isdir(path):
         shutil.rmtree(path)
     progress.Destroy()
+
+def reset(parent):
+    dialog = wx.MessageDialog(parent, title=TITLE+"  初期化", "※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
+    if dialog.ShowModal() == wx.ID_YES:
+        cleanup(ROOT, parent)
+        subprocess.Popen(sys.argv[0], close_fds=True)
+        parent.Close()
 
 def encrypt(file, password):
     file.seek(0)
