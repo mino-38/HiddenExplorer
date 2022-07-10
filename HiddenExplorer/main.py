@@ -102,7 +102,7 @@ def cleanup(path, parent):
     progress.Destroy()
 
 def reset(parent):
-    dialog = wx.MessageDialog(parent, title=TITLE+"  初期化", "※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
+    dialog = wx.MessageDialog(parent, caption=TITLE+"  初期化", message="※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
         cleanup(ROOT, parent)
         subprocess.Popen(sys.argv[0], close_fds=True)
@@ -193,7 +193,7 @@ class MainFrame(wx.Frame):
         self.files = None
         self.selected_widget = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: ResetPasswordDialog(self).ShowModal()}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: ResetPasswordDialog(self).ShowModal(), 5: reset(self)}
         self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
@@ -202,6 +202,7 @@ class MainFrame(wx.Frame):
         menu_config.Append(3, "設定を開く")
         if os.path.isfile(crypto_file):
             menu_config.Append(4, "パスワードの再設定")
+        menu_config.Append(5, "初期化")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
         menu_bar.Append(menu_config, "設定")
