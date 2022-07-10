@@ -133,7 +133,7 @@ class CleanUp:
             except:
                 continue
             progress.Update(round(n / length * 100))
-        if parent.bytes and configmanager["0"] and ROOT not in path:
+        if parent.bytes and configmanager["0"] and ROOT not in self.path:
             temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
             try:
                 with open(temp_zip, "wb") as f:
