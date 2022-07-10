@@ -108,7 +108,7 @@ class CleanUp:
     def register(self, value):
         self.path.append(value)
 
-    def __call__(parent):
+    def __call__(self, parent):
         if not self.path:
             return
         if not wx.GetApp():
