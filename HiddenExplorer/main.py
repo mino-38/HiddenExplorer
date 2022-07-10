@@ -193,7 +193,7 @@ class MainFrame(wx.Frame):
         self.files = None
         self.selected_widget = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: ResetPasswordDialog(self).ShowModal(), 5: reset(self)}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: lambda: ResetPasswordDialog(self).ShowModal(), 5: lambda: reset(self)}
         self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
@@ -573,6 +573,9 @@ class ResetPasswordDialog(wx.Dialog):
         self.ctrl1.Bind(wx.EVT_TEXT_ENTER, RunFunction(self.ctrl2.SetFocus))
         self.ctrl2.Bind(wx.EVT_TEXT_ENTER, RunFunction(self.ctrl3.SetFocus))
         self.ctrl3.Bind(wx.EVT_TEXT_ENTER, self.run)
+        self.panel.SetSizer(sizer)
+        self.sizer.Add(self.panel)
+        self.SetSizer(self.sizer)
 
     def run(self, e):
         bytes_ = decrypt(self.ctrl1.GetValue())
