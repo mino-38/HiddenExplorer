@@ -105,7 +105,7 @@ def reset(parent):
     dialog = wx.MessageDialog(parent, caption=TITLE+"  初期化", message="※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
         cleanup(ROOT, parent)
-        subprocess.Popen(sys.argv[0], close_fds=True)
+        subprocess.Popen(sys.executable, close_fds=True)
         parent.Close()
 
 def encrypt(file, password):
