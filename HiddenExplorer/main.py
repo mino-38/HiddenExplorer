@@ -35,7 +35,7 @@ FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
 RESOURCE = os.path.join(os.path.dirname(__file__), "resources")
 
-root = os.path.join(os.getenv("USERPROFILE" if _win else "HOME"), ".HiddenExplorer")
+root = os.path.join(os.getenv("APPDATA"), "Local", ".HiddenExplorer") if _win else os.getenv("HOME")
 if not os.path.isdir(root):
     os.mkdir(root)
 crypto_file = os.path.join(root, ".data")
