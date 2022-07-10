@@ -563,6 +563,7 @@ class ResetPasswordDialog(wx.Dialog):
     def __init__(self, parent):
         super().__init__(parent, title=TITLE, size=ResetPasswordDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
         self.parent = parent
+        self.running = False
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.build()
@@ -594,6 +595,10 @@ class ResetPasswordDialog(wx.Dialog):
         self.SetSizer(self.sizer)
 
     def run(self, e):
+        if self.running:
+            return
+        self.button.Disable()
+        self.running = True
         bytes_ = decrypt(self.ctrl1.GetValue())
         temp = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
@@ -609,9 +614,13 @@ class ResetPasswordDialog(wx.Dialog):
                     self.Close()
                 else:
                     self.error.SetLabel("新しいパスワードが確認用と一致していません")
+                    self.button.Enable()
+                    self.running = False
                     self.Refresh()
             else:
                 self.error.SetLabel("現在のパスワードが違います")
+                self.button.Enable()
+                self.running = False
                 self.Refresh()
         finally:
             os.remove(temp)
