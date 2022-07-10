@@ -75,7 +75,7 @@ def cleanup(path, parent):
         except:
             continue
         progress.Update(round(n / length * 100))
-    if configmanager["0"] and path != ROOT:
+    if parent.bytes and configmanager["0"] and path != ROOT:
         temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
         try:
             with open(temp_zip, "wb") as f:
