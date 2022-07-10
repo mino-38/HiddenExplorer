@@ -185,13 +185,15 @@ class MainFrame(wx.Frame):
         self.files = None
         self.selected_widget = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show()}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: ResetPasswordDialog(self).ShowModal()}
         self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
         menu_config = wx.Menu()
         menu_config.Append(3, "設定を開く")
+        if os.path.isfile(crypto_file):
+            menu_config.Append(4, "パスワードの再設定")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
         menu_bar.Append(menu_config, "設定")
@@ -475,7 +477,6 @@ class SettingFrame(wx.Frame):
             configmanager[str(n)] = b.GetValue()
         configmanager.save()
         self.Close()
-        
 
 class AskPasswordFrame(wx.Frame):
     size = (250, 140)
@@ -536,6 +537,7 @@ class ResetPasswordDialog(wx.Dialog):
     size = (320, 200)
     def __init__(self, parent):
         super().__init__(parent, title=TITLE, size=ResetPasswordDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+        self.parent = parent
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
         self.build()
@@ -575,6 +577,7 @@ class ResetPasswordDialog(wx.Dialog):
                 if new_password == self.ctrl3.GetValue():
                     with open(temp, "rb") as f:
                         encrypt(f, new_password)
+                    self.parent.password = new_password
                     self.Close()
                 else:
                     self.error.SetLabel("新しいパスワードが確認用と一致していません")
