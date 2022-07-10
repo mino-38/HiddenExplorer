@@ -37,7 +37,7 @@ RESOURCE = os.path.join(os.path.dirname(__file__), "resources")
 ROOT = os.path.join(os.getenv("APPDATA"), "Local", ".HiddenExplorer") if _win else os.getenv("HOME")
 
 if not os.path.isdir(ROOT):
-    os.mkdir(root)
+    os.mkdir(ROOT)
 crypto_file = os.path.join(ROOT, ".data")
 key_file = os.path.join(ROOT, ".key")
 config_file = os.path.join(ROOT, ".rc")
