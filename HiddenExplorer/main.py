@@ -34,7 +34,7 @@ TITLE = "HiddenExplorer"
 FILL = b"\r"
 IV = b"aaaaaaaaaaaaaaaa"
 RESOURCE = os.path.join(os.path.dirname(__file__), "resources")
-ROOT = os.path.join(os.getenv("APPDATA"), "Local", ".HiddenExplorer") if _win else os.getenv("HOME")
+ROOT = os.path.join(os.getenv("LOCALAPPDATA"), ".HiddenExplorer") if _win else os.getenv("HOME")
 
 if not os.path.isdir(ROOT):
     os.mkdir(ROOT)
