@@ -215,7 +215,7 @@ class MainFrame(wx.Frame):
         menu_config = wx.Menu()
         menu_config.Append(3, "設定を開く")
         if os.path.isfile(crypto_file):
-            menu_config.Append(4, "パスワードの再設定")
+            menu_config.Append(4, "パスワードの変更")
         menu_config.Append(5, "初期化")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
@@ -580,7 +580,7 @@ class ResetPasswordDialog(wx.Dialog):
         sizer.Add(wx.StaticText(self.panel, wx.ID_ANY, "確認"))
         self.ctrl3 = wx.TextCtrl(self.panel, size=(400, 20), style=wx.TE_PROCESS_ENTER | wx.TE_PASSWORD)
         sizer.Add(self.ctrl3)
-        self.button = wx.Button(self.panel, wx.ID_ANY, "設定")
+        self.button = wx.Button(self.panel, wx.ID_ANY, "変更")
         self.button.Bind(wx.EVT_BUTTON, self.run)
         sizer.Add(self.button)
         self.error = wx.StaticText(self.panel)
