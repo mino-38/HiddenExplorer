@@ -56,56 +56,10 @@ def make_cmd(path, notepad=False):
     else:
         return 'open "{}"'.format(path)
 
-def cleanup(path, parent):
-    if not wx.GetApp():
-        app = wx.App()
-    progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
-    progress.Pulse()
-    progress.Show()
-    processes = list(psutil.process_iter())
-    length = len(processes)
-    progress.Update(0, newmsg="クリーンアップ中...")
-    for n, p in enumerate(processes, start=1):
-        try:
-            for q in p.open_files():
-                if ".." not in os.path.relpath(q.path, path):
-                    p.kill()
-            if ".." not in os.path.relpath(p.exe(), path):
-                p.kill()
-        except:
-            continue
-        progress.Update(round(n / length * 100))
-    if parent.bytes and configmanager["0"] and path != ROOT:
-        temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
-        try:
-            with open(temp_zip, "wb") as f:
-                f.write(parent.bytes)
-            with tempfile.TemporaryDirectory() as d:
-                with zipfile.ZipFile(temp_zip, "r") as z:
-                    z.extractall(d)
-                for p in glob.iglob(os.path.join(path, "*")):
-                    to = os.path.join(d, os.path.basename(p.rstrip(os.sep)))
-                    if os.path.isdir(to):
-                        shutil.rmtree(to)
-                    shutil.move(p, to)
-                shutil.make_archive(temp_zip, format="zip", root_dir=d)
-                with open(temp_zip+".zip", "rb") as f:
-                    encrypt(f, parent.password)
-                os.remove(temp_zip+".zip")
-        finally:
-            os.remove(temp_zip)
-    progress.Update(100)
-    if os.path.isfile(path):
-        os.remove(path)
-    elif os.path.isdir(path):
-        shutil.rmtree(path)
-    progress.Destroy()
-
 def reset(parent):
     dialog = wx.MessageDialog(parent, caption=TITLE+"  初期化", message="※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
-        cleanup(ROOT, parent)
-        subprocess.Popen(sys.executable, close_fds=True)
+        parent.cleanup.register(ROOT)
         parent.Close()
 
 def encrypt(file, password):
@@ -146,6 +100,66 @@ def textwrap(text, length):
 def register_on_exit(func):
     atexit.register(func)
     signal.signal(signal.SIGTERM, lambda: (func(), sys.exit(1)))
+
+class CleanUp:
+    def __init__(self):
+        self.path = []
+
+    def register(self, value):
+        self.path.append(value)
+
+    def __call__(parent):
+        if not self.path:
+            return
+        if not wx.GetApp():
+            app = wx.App()
+        progress = wx.ProgressDialog(TITLE, "プロセス情報を取得中...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME | wx.PD_AUTO_HIDE) 
+        progress.Pulse()
+        progress.Show()
+        processes = list(psutil.process_iter())
+        length = len(processes)
+        progress.Update(0, newmsg="クリーンアップ中...")
+        for n, p in enumerate(processes, start=1):
+            try:
+                for q in p.open_files():
+                    for t in self.path:
+                        if ".." not in os.path.relpath(q.path, t):
+                            p.kill()
+                            break
+                for t in self.path:
+                    if ".." not in os.path.relpath(p.exe(), t):
+                        p.kill()
+                        break
+            except:
+                continue
+            progress.Update(round(n / length * 100))
+        if parent.bytes and configmanager["0"] and ROOT not in path:
+            temp_zip = os.path.join(tempfile.gettempdir(), ".random_{}.{}".format(os.getpid(), time.time()))
+            try:
+                with open(temp_zip, "wb") as f:
+                    f.write(parent.bytes)
+                with tempfile.TemporaryDirectory() as d:
+                    with zipfile.ZipFile(temp_zip, "r") as z:
+                        z.extractall(d)
+                    for t in self.path:
+                        for p in glob.iglob(os.path.join(t, "*")):
+                            to = os.path.join(d, os.path.basename(p.rstrip(os.sep)))
+                            if os.path.isdir(to):
+                                shutil.rmtree(to)
+                            shutil.move(p, to)
+                    shutil.make_archive(temp_zip, format="zip", root_dir=d)
+                    with open(temp_zip+".zip", "rb") as f:
+                        encrypt(f, parent.password)
+                    os.remove(temp_zip+".zip")
+            finally:
+                os.remove(temp_zip)
+        progress.Update(100)
+        for t in self.path:
+            if os.path.isfile(t):
+                os.remove(t)
+            elif os.path.isdir(t):
+                shutil.rmtree(t)
+        progress.Destroy()
 
 class ConfigManager(dict):
     configs = {"0": "ファイル、ディレクトリの変更を保持する", "options": ""}
@@ -214,7 +228,9 @@ class MainFrame(wx.Frame):
         self.SetIcon(self.icon)
         self.Bind(wx.EVT_SIZE, self.resize_panel)
         self.app_dir = tempfile.TemporaryDirectory().name
-        register_on_exit(RunFunction(cleanup, self.app_dir, self))
+        self.cleanup = CleanUp()
+        self.cleanup.register(self.app_dir)
+        register_on_exit(RunFunction(self.cleanup, self))
         self.build()
 
     def resize_panel(self, e):
