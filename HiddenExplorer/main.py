@@ -57,7 +57,7 @@ def make_cmd(path, notepad=False):
         return 'open "{}"'.format(path)
 
 def reset(parent):
-    dialog = wx.MessageDialog(parent, caption=TITLE+"  初期化", message="※初期化をすると現在登録されているファイルは全て消去されます\nそれでも初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
+    dialog = wx.MessageDialog(parent, caption=TITLE+"  初期化", message="※初期化をすると現在登録されているファイル及びパスワードは全て消去され、HiddenExplorerは閉じられます\n初期化をしますか？", style=wx.YES_NO | wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
         parent.cleanup.register(ROOT)
         parent.Close()
