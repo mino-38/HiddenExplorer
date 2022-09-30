@@ -796,11 +796,11 @@ class OpenBrowserDialog(wx.Dialog):
                     f.write(self.parent.bytes)
                 with zipfile.ZipFile(temp_zip, "r") as z:
                     try:
-                        file = z.extract(self.download_dir, self.app_dir)
+                        file = z.extract(self.download_dir, self.parent.app_dir)
                     except:
-                        file = z.extract(self.download_dir+"/", self.app_dir)
+                        file = z.extract(self.download_dir+"/", self.parent.app_dir)
                     for p in [t for t in z.namelist() if t.startswith(os.path.basename(directory))]:
-                        z.extract(p, self.app_dir)
+                        z.extract(p, self.parent.app_dir)
             finally:
                 os.remove(temp_zip)
         if index == 0:
