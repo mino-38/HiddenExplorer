@@ -762,6 +762,30 @@ class RemoveDialog(wx.Dialog):
         self.draw()
         self.Close()
 
+class OpenBrowserDialog(wx.Dialog):
+    size = (300, 200)
+    def __init__(self, parent, download_dir):
+        super().__init__(parent, title=TITLE, size=OpenBrowserDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+        self.download_dir = download_dir
+        self.browsers = ["Chrome", "Firefox", "Edge", "IE", "Opera"]
+        self.build()
+
+    def build(self):
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        panel = wx.Panel(self, size=OpenBrowserDialog.size)
+        sizer = wx.GridSizer(cols=3)
+        for n, b in enumerate(self.browsers):
+            button = wx.Button(panel, wx.ID_ANY, b)
+            button.Bind(wx.EVT_BUTTON, RunFunction(self.run, n))
+            sizer.Add(button)
+        panel.SetSizer(sizer)
+        self.sizer.Add(panel)
+        self.SetSizer(self.sizer)
+
+    def run(self, index):
+        if index == 0:
+            from webdriver_manager.chrome import ChromeDriverManager as manager
+
 def main():
     app = wx.App()
     if os.path.isfile(crypto_file):
