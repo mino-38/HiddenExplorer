@@ -788,14 +788,22 @@ class OpenBrowserDialog(wx.Dialog):
     def run(self, index):
         if index == 0:
             from webdriver_manager.chrome import ChromeDriverManager as manager
+            options = webdriver.ChromeOptions()
+            options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         elif index == 1:
             from webdriver_manager.firefox import GeckoDriverManager as manager
         elif index == 2:
             from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
+            options = webdriver.EdgeChromiumOptions()
+            options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         elif index == 3:
             from webdriver_manager.microsoft import IEDriverManager as manager
+            options = webdriver.IEOptions()
+            options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         else:
             from webdriver_manager.opera import OperaDriverManager as manager
+            options = webdriver.OperaOptions()
+            options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         progress = wx.ProgressDialog(TITLE, "ブラウザを開いています...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
         progress.SetIcon(self.icon)
         progress.Show()
