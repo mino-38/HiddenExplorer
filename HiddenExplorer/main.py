@@ -792,13 +792,15 @@ class OpenBrowserDialog(wx.Dialog):
             options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         elif index == 1:
             from webdriver_manager.firefox import GeckoDriverManager as manager
+            options = webdriver.ChromeOptions()
+            options.set_preference("browser.download.dir", self.download_dir)
         elif index == 2:
             from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
             options = webdriver.EdgeChromiumOptions()
             options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         elif index == 3:
             from webdriver_manager.microsoft import IEDriverManager as manager
-            options = webdriver.IEOptions()
+            options = webdriver.FirefoxOptions()
             options.add_experimental_option("prefs", {"download.default_directory": self.download_dir})
         else:
             from webdriver_manager.opera import OperaDriverManager as manager
@@ -808,7 +810,7 @@ class OpenBrowserDialog(wx.Dialog):
         progress.SetIcon(self.icon)
         progress.Show()
         progress.Pulse()
-        self.driver = getattr(webdriver, self.browsers[index])(manager().install())
+        self.driver = getattr(webdriver, self.browsers[index])(manager().install(), options=options)
         progress.Close()
 
 def main():
