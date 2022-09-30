@@ -812,8 +812,14 @@ class OpenBrowserDialog(wx.Dialog):
         progress.SetIcon(self.icon)
         progress.Show()
         progress.Pulse()
-        self.driver = getattr(webdriver, self.browsers[index])(manager().install(), options=options)
-        progress.Close()
+        try:
+            self.driver = getattr(webdriver, self.browsers[index])(manager().install(), options=options)
+            progress.Close()
+        except:
+            progress.Close()
+            wx.MessageBox("ブラウザの起動に失敗しました\nブラウザがインストールされていない可能性があります")
+        finally:
+            self.Close()
 
 def main():
     app = wx.App()
