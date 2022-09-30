@@ -23,6 +23,7 @@ import wx
 from multiprocessing import Process
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES
+from selenium import webdriver
 from PIL import Image
 from wx.lib.scrolledpanel import ScrolledPanel
 
@@ -767,7 +768,9 @@ class OpenBrowserDialog(wx.Dialog):
     def __init__(self, parent, download_dir):
         super().__init__(parent, title=TITLE, size=OpenBrowserDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
         self.download_dir = download_dir
-        self.browsers = ["Chrome", "Firefox", "Edge", "IE", "Opera"]
+        self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
+        self.SetIcon(self.icon)
+        self.browsers = ["Chrome", "Firefox", "Edge", "Ie", "Opera"]
         self.build()
 
     def build(self):
@@ -791,9 +794,14 @@ class OpenBrowserDialog(wx.Dialog):
             from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
         elif index == 3:
             from webdriver_manager.microsoft import IEDriverManager as manager
-        elif index == 4:
+        else:
             from webdriver_manager.opera import OperaDriverManager as manager
-
+        progress = wx.ProgressDialog(TITLE, "ブラウザを開いています...", style=wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
+        progress.SetIcon(self.icon)
+        progress.Show()
+        progress.Pulse()
+        self.driver = getattr(webdriver, self.browsers[index])(manager().install())
+        progress.Close()
 
 def main():
     app = wx.App()
