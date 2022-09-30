@@ -809,7 +809,7 @@ class OpenBrowserDialog(wx.Dialog):
             options.add_experimental_option("prefs", {"download.default_directory": directory})
         elif index == 1:
             from webdriver_manager.firefox import GeckoDriverManager as manager
-            options = webdriver.ChromeOptions()
+            options = webdriver.FirefoxProfile()
             options.set_preference("browser.download.dir", directory)
         elif index == 2:
             from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
