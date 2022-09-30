@@ -831,7 +831,8 @@ class OpenBrowserDialog(wx.Dialog):
         progress.Show()
         progress.Pulse()
         try:
-            self.driver = getattr(webdriver, self.browsers[index])(manager().install(), options=options)
+            driver = getattr(webdriver, self.browsers[index])(manager().install(), options=options)
+            register_on_exit(RunFunction(driver.quit))
             progress.Close()
         except:
             progress.Close()
