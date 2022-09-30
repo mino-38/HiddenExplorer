@@ -208,16 +208,16 @@ class MainFrame(wx.Frame):
         self.files = None
         self.selected_widget = None
         self.SetDropTarget(FileDropTarget(self.add))
-        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: SettingFrame(self).Show(), 4: lambda: ResetPasswordDialog(self).ShowModal(), 5: lambda: reset(self)}
-        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal()}
+        self.frame_menu_func = {1: self.add_from_dialog, 2: lambda: self.add_from_dialog(True), 3: lambda: OpenBrowserDialog(self, self.app_dir).ShowModal(), 4: lambda: SettingFrame(self).Show(), 5: lambda: ResetPasswordDialog(self).ShowModal(), 6: lambda: reset(self)}
+        self.menu_func = {1: lambda p: self.run_file(p), 2: lambda p: self.run_file(p, notepad=True), 3: lambda p: RemoveDialog(self, p).ShowModal(), 4: lambda p: OpenBrowserDialog(self, p).ShowModal()}
         menu_file = wx.Menu()
         menu_file.Append(1, "ファイルを追加")
         menu_file.Append(2, "ディレクトリを追加")
         menu_config = wx.Menu()
-        menu_config.Append(3, "設定を開く")
+        menu_config.Append(4, "設定を開く")
         if os.path.isfile(crypto_file):
-            menu_config.Append(4, "パスワードの変更")
-        menu_config.Append(5, "初期化")
+            menu_config.Append(5, "パスワードの変更")
+        menu_config.Append(6, "初期化")
         menu_bar = wx.MenuBar()
         menu_bar.Append(menu_file, "ファイル")
         menu_bar.Append(menu_config, "設定")
@@ -412,6 +412,7 @@ class MainFrame(wx.Frame):
         menu.Append(wx.MenuItem(menu, 1, "開く"))
         if directory:
             menu.Append(wx.MenuItem(menu, 2, "ファイルエクスプローラーで開く"))
+            menu.Append(wx.MenuItem(menu, 4, "このディレクトリをダウンロード先としたブラウザを開く"))
         elif _win:
             menu.Append(wx.MenuItem(menu, 2, "メモ帳で開く"))
         menu.AppendSeparator()
@@ -767,6 +768,7 @@ class OpenBrowserDialog(wx.Dialog):
     size = (300, 200)
     def __init__(self, parent, download_dir):
         super().__init__(parent, title=TITLE, size=OpenBrowserDialog.size, style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+        self.parent = parent
         self.download_dir = download_dir
         self.icon = wx.Icon(os.path.join(RESOURCE, "HiddenExplorer.ico"), wx.BITMAP_TYPE_ICO)
         self.SetIcon(self.icon)
