@@ -807,6 +807,7 @@ class OpenBrowserDialog(wx.Dialog):
             from webdriver_manager.chrome import ChromeDriverManager as manager
             options = webdriver.ChromeOptions()
             options.add_experimental_option("prefs", {"download.default_directory": directory})
+            options.add_argument("--user-data-dir={}".format(os.path.join(os.getenv("LOCALAPPDATA"), "Google", "Chrome", "User Data")))
         elif index == 1:
             from webdriver_manager.firefox import GeckoDriverManager as manager
             options = webdriver.FirefoxProfile()
@@ -815,10 +816,12 @@ class OpenBrowserDialog(wx.Dialog):
             from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
             options = webdriver.EdgeChromiumOptions()
             options.add_experimental_option("prefs", {"download.default_directory": directory})
+            options.add_argument("--user-data-dir={}".format(os.path.join(os.getenv("LOCALAPPDATA"), "Microsoft", "Edge", "User Data")))
         elif index == 3:
             from webdriver_manager.microsoft import IEDriverManager as manager
             options = webdriver.FirefoxOptions()
             options.add_experimental_option("prefs", {"download.default_directory": directory})
+            options.add_argument("--user-data-dir={}".format(os.path.join(os.getenv("LOCALAPPDATA"), "Microsoft", "IE", "User Data")))
         else:
             from webdriver_manager.opera import OperaDriverManager as manager
             options = webdriver.OperaOptions()
