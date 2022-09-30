@@ -785,6 +785,15 @@ class OpenBrowserDialog(wx.Dialog):
     def run(self, index):
         if index == 0:
             from webdriver_manager.chrome import ChromeDriverManager as manager
+        elif index == 1:
+            from webdriver_manager.firefox import GeckoDriverManager as manager
+        elif index == 2:
+            from webdriver_manager.microsoft import EdgeChromiumDriverManager as manager
+        elif index == 3:
+            from webdriver_manager.microsoft import IEDriverManager as manager
+        elif index == 4:
+            from webdriver_manager.opera import OperaDriverManager as manager
+
 
 def main():
     app = wx.App()
