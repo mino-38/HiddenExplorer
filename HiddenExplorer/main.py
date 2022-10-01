@@ -803,11 +803,14 @@ class OpenBrowserDialog(wx.Dialog):
                         z.extract(p, self.parent.app_dir)
             finally:
                 os.remove(temp_zip)
+        profile_tmp = tempfile.TemporaryDirectory().name
         if index == 0:
             from webdriver_manager.chrome import ChromeDriverManager as manager
             options = webdriver.ChromeOptions()
             options.add_experimental_option("prefs", {"download.default_directory": directory})
-            options.add_argument("--user-data-dir={}".format(os.path.join(os.getenv("LOCALAPPDATA"), "Google", "Chrome", "User Data")))
+            profile = os.path.join(os.getenv("LOCALAPPDATA"), "Google", "Chrome", "User Data")
+            shutil.copy(profile, profile_tmp)
+            options.add_argument("--user-data-dir={}".format(profile_tmp))
         elif index == 1:
             from webdriver_manager.firefox import GeckoDriverManager as manager
             options = webdriver.FirefoxProfile()
