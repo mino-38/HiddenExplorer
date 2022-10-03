@@ -3,3 +3,5 @@ pycryptodome
 Pillow
 pywin32
 psutil
+selenium
+webdriver_manager
